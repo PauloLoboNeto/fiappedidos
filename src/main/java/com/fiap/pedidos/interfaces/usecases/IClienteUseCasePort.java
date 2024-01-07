@@ -13,6 +13,6 @@ public interface IClienteUseCasePort {
     Cliente identificarPorCpf(Cpf cpf);
     UUID gerarId();
     Optional<Cliente> buscarPorCpf(Cpf cpf);
-//    List<Cliente> bucarTodos();
+    List<Cliente> bucarTodos();
     Optional<Cliente> buscarPorId(UUID uuid);
 }

@@ -7,10 +7,7 @@ import com.fiap.pedidos.exceptions.entities.PedidoNaoEncontradoException;
 import com.fiap.pedidos.exceptions.entities.PedidoOperacaoNaoSuportadaException;
 import com.fiap.pedidos.exceptions.entities.PedidoProdutoNaoEncontradoException;
 import com.fiap.pedidos.exceptions.entities.ProdutoNaoEncontradoException;
-import com.fiap.pedidos.gateways.entities.PedidoEntity;
 import com.fiap.pedidos.interfaces.gateways.IPedidoProdutoRepositoryPort;
-import com.fiap.pedidos.interfaces.gateways.IPedidoRepositoryPort;
-import com.fiap.pedidos.interfaces.gateways.IProdutoRepositoryPort;
 import com.fiap.pedidos.interfaces.usecases.IPedidoProdutoUseCasePort;
 import com.fiap.pedidos.interfaces.usecases.IPedidoUseCasePort;
 import com.fiap.pedidos.interfaces.usecases.IProdutoUseCasePort;
@@ -19,7 +16,6 @@ import lombok.RequiredArgsConstructor;
 
 import java.util.Date;
 import java.util.Optional;
-import java.util.UUID;
 
 @RequiredArgsConstructor
 public class PedidoProdutoUseCaseImpl implements IPedidoProdutoUseCasePort {
@@ -29,17 +25,15 @@ public class PedidoProdutoUseCaseImpl implements IPedidoProdutoUseCasePort {
     private final IProdutoUseCasePort produtoUseCasePort;
 
     @Override
-    public void adicionarItemNoPedido(PedidoProduto pedidoProduto) {
+    public Pedido adicionarItemNoPedido(PedidoProduto pedidoProduto) {
         Optional<PedidoProduto> optionalPedidoProduto = pedidoProdutoRepositoryPort.buscarPorId(pedidoProduto.getId());
         validarPedidoProduto(optionalPedidoProduto);
-
 
         Optional<Pedido> optionalPedido = pedidoUseCasePort.buscarPorId(pedidoProduto.getPedidoId());
         validarPedido(optionalPedido);
 
         Optional<Produto> optionalProduto = produtoUseCasePort.buscarPorId(pedidoProduto.getProdutoId());
         validarProduto(optionalProduto);
-
 
         Pedido pedido = optionalPedido.get();
         Produto produto = optionalProduto.get();
@@ -52,11 +46,11 @@ public class PedidoProdutoUseCaseImpl implements IPedidoProdutoUseCasePort {
                         .add(produto.getValorProduto().getValorProduto())
         );
 
-        pedidoUseCasePort.atualizarPedidoEmAberto(pedido);
+       return pedidoUseCasePort.atualizarPedido(pedido);
     }
 
     @Override
-    public void removerItemDoPedido(PedidoProduto pedidoProduto) {
+    public Pedido removerItemDoPedido(PedidoProduto pedidoProduto) {
         Optional<PedidoProduto> optionalPedidoProduto = pedidoProdutoRepositoryPort.buscarPorId(pedidoProduto.getId());
         validarPedidoProduto(optionalPedidoProduto);
 
@@ -76,7 +70,8 @@ public class PedidoProdutoUseCaseImpl implements IPedidoProdutoUseCasePort {
 
         pedido.setValorPedido(novoValorPedido);
         pedido.setDataAtualizacao(new Date());
-        pedidoUseCasePort.atualizarPedidoEmAberto(pedido);
+
+        return pedidoUseCasePort.atualizarPedido(pedido);
     }
 
     private void validarPedido(Optional<Pedido> optionalPedido) {

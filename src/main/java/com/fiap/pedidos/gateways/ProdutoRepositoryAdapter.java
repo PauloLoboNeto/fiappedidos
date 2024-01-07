@@ -57,7 +57,7 @@ public class ProdutoRepositoryAdapter implements IProdutoRepositoryPort {
     @Transactional()
     public void deletarProduto(UUID idProduto) {
         Optional<ProdutoEntity> produto = this.produtoRepository.findById(idProduto);
-        if (!produto.isPresent())
+        if (produto.isEmpty())
             throw new ProdutoNaoEncontradoException();
         produto.get().setAtivo(false);
         this.produtoRepository.save(produto.get());

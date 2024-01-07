@@ -10,9 +10,7 @@ import java.util.UUID;
 
 public interface IPedidoProdutoRepositoryPort {
 
-    List<PedidoProduto> buscarTodos();
     Optional<PedidoProduto> buscarPorId(UUID id);
-    List<PedidoProduto> buscarPorPedido(Pedido pedido);
     PedidoProduto adicionarPedidoProduto(Pedido pedido, Produto produto, PedidoProduto pedidoProduto);
     void excluirPedidoProduto(UUID idProduto);
 }

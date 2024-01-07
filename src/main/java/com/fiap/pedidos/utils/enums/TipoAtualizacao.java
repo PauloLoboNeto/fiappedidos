@@ -4,7 +4,8 @@ public enum TipoAtualizacao {
 
     F("FILA"),
     P("PAGAMENTO"),
-    D("DEFAULT");
+    I("ITEM"),
+    C("CHECKOUT");
 
     private final String descricao;
 

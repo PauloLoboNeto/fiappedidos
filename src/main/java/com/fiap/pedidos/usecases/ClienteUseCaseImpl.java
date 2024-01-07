@@ -27,10 +27,13 @@ public class ClienteUseCaseImpl implements IClienteUseCasePort {
     @Override
     public Cliente identificarPorCpf(Cpf cpf) {
         Optional<Cliente> clienteDb = buscarPorCpf(cpf);
-        if (clienteDb.isPresent())
-            return clienteDb.get();
-        else
-            return clienteRepositoryPort.identificarPorCpf(Cliente.builder().cpf(cpf).build());
+        return clienteDb
+                .orElseGet(() -> clienteRepositoryPort.identificarPorCpf(Cliente.builder().cpf(cpf).build()));
+    }
+
+    @Override
+    public List<Cliente> bucarTodos() { // TODO - temp remover posteriormente
+        return clienteRepositoryPort.bucarTodos();
     }
 
     @Override
@@ -42,11 +45,6 @@ public class ClienteUseCaseImpl implements IClienteUseCasePort {
     public Optional<Cliente> buscarPorCpf(Cpf cpf) {
         return clienteRepositoryPort.buscarPorCpf(cpf);
     }
-
-//    @Override
-//    public List<Cliente> bucarTodos() { // TODO - temp remover posteriormente
-//        return clienteRepositoryPort.bucarTodos();
-//    }
 
     @Override
     public Optional<Cliente> buscarPorId(UUID uuid) {

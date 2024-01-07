@@ -5,7 +5,6 @@ import com.fiap.pedidos.entities.PedidoProduto;
 import com.fiap.pedidos.entities.Produto;
 import com.fiap.pedidos.exceptions.entities.PedidoNaoEncontradoException;
 import com.fiap.pedidos.exceptions.entities.PedidoOperacaoNaoSuportadaException;
-import com.fiap.pedidos.exceptions.entities.PedidoProdutoNaoEncontradoException;
 import com.fiap.pedidos.gateways.entities.PedidoEntity;
 import com.fiap.pedidos.gateways.entities.PedidoProdutoEntity;
 import com.fiap.pedidos.gateways.entities.ProdutoEntity;
@@ -18,11 +17,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -34,29 +30,9 @@ public class PedidoProdutoRepositoryAdapter implements IPedidoProdutoRepositoryP
 
     @Override
     @Transactional(readOnly = true)
-    public List<PedidoProduto> buscarTodos() {
-        return this.pedidoProdutoRepository.findAll().stream()
-                .map(PedidoProdutoEntity::to)
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    @Transactional(readOnly = true)
     public Optional<PedidoProduto> buscarPorId(UUID id) {
         return this.pedidoProdutoRepository.findById(id)
                 .map(PedidoProdutoEntity::to);
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public List<PedidoProduto> buscarPorPedido(Pedido pedido) {
-        PedidoEntity pedidoEntity = this.pedidoRepository.findById(pedido.getIdPedido())
-                .orElseThrow(() -> new PedidoNaoEncontradoException("Pedido não encontrado, id: " + pedido.getIdPedido()));
-
-        return this.pedidoProdutoRepository.findByPedido(pedido)
-                .stream()
-                .map(PedidoProdutoEntity::to)
-                .collect(Collectors.toList());
     }
 
     @Override

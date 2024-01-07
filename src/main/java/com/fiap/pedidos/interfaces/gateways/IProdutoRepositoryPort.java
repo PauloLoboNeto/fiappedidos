@@ -11,7 +11,6 @@ public interface IProdutoRepositoryPort {
     List<Produto> listarProdutosPorTipo(TipoProduto tipoProduto);
     Produto criarProduto(Produto produto);
     void deletarProduto(UUID idProduto);
-
     Optional<Produto> buscarPorId(UUID idProduto);
 
 }

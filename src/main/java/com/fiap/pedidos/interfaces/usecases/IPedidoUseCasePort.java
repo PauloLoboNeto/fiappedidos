@@ -12,21 +12,13 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface IPedidoUseCasePort {
-    Pedido cadastrar(Pedido pedido);
+    Pedido iniciarPedido(Pedido pedido);
 
-    Pedido atualizarPedido(Pedido pedido, TipoAtualizacao tipoAtualizacao)  throws PedidoNaoEncontradoException;
-
-    void remover(UUID idPedido);
     Optional<Pedido> buscarPorId(UUID idPedido);
 
-    List<Pedido> buscarPedidosPorStatus(StatusPedido statusPedido);
+    List<Pedido> buscarTodos(int pageNumber, int pageSize);
 
-    Pedido checkout(UUID idPedido);
+    Pedido atualizarPedido(UUID idPedido, TipoAtualizacao tipoAtualizacao, Pedido pedido, StatusPedido statusPedido);
 
-    Pedido atualizarPedidoPagamento(UUID idPedido);
-
-    Pedido atualizarPedidoFila(UUID idPedido, StatusPedido statusPedido);
-
-    Pedido atualizarPedidoDefault(Pedido pedido);
-
+    Pedido atualizarPedido(Pedido pedido);
 }

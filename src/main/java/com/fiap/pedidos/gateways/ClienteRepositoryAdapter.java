@@ -42,7 +42,7 @@ public class ClienteRepositoryAdapter implements IClienteRepositoryPort {
     }
 
     @Override
-    public List<Cliente> bucarTodos() { // TODO - temp remover posteriormente
+    public List<Cliente> bucarTodos() {
         List<ClienteEntity> test = clienteRepository.findAll();
         List<Cliente> test2 = test.stream().map(e -> e.to(e)).collect(Collectors.toList());
         return test2;

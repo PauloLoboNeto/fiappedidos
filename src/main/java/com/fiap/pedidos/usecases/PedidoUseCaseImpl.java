@@ -3,6 +3,7 @@ package com.fiap.pedidos.usecases;
 import com.fiap.pedidos.entities.Pedido;
 import com.fiap.pedidos.exceptions.entities.PedidoNaoEncontradoException;
 import com.fiap.pedidos.exceptions.entities.PedidoOperacaoNaoSuportadaException;
+import com.fiap.pedidos.interfaces.gateways.IPagamentoRepositoryPort;
 import com.fiap.pedidos.interfaces.gateways.IPedidoRepositoryPort;
 import com.fiap.pedidos.interfaces.usecases.IPedidoUseCasePort;
 import com.fiap.pedidos.utils.enums.StatusPagamento;
@@ -16,87 +17,87 @@ import java.util.*;
 public class PedidoUseCaseImpl implements IPedidoUseCasePort {
 
     private final IPedidoRepositoryPort pedidoRepositoryPort;
+    private final IPagamentoRepositoryPort pagamentoRepositoryPort;
 
     @Override
-    public Pedido cadastrar(Pedido pedido) {
+    public Pedido iniciarPedido(Pedido pedido) {
         UUID idCliente = pedido.getCliente().getId();
-        List<Pedido> pedidosAtivos = buscarPedidosPorClienteEStatus(idCliente, StatusPedido.A);
+
+        List<Pedido> pedidosAtivos = this.pedidoRepositoryPort
+                .buscarPedidosPorClienteEStatus(idCliente, StatusPedido.A);
+
         if (pedidosAtivos.isEmpty()) {
             return pedidoRepositoryPort.cadastrar(pedido);
-        } else {
-            pedidosAtivos.sort(Comparator.comparing(Pedido::getDataInclusao).reversed());
-            return pedidosAtivos.get(0);
         }
+
+        pedidosAtivos.sort(Comparator.comparing(Pedido::getDataInclusao).reversed());
+        return pedidosAtivos.get(0);
     }
 
     @Override
-    public void remover(UUID id) {
-        pedidoRepositoryPort.remover(id);
-    }
+    public Pedido atualizarPedido(
+            UUID idPedido,
+            TipoAtualizacao tipoAtualizacao,
+            Pedido pedidoRequest,
+            StatusPedido statusPedido) {
 
-    @Override
-    public Pedido atualizarPedidoPagamento(UUID idPedido) {
         Optional<Pedido> pedidoOptional = buscarPorId(idPedido);
 
         if (pedidoOptional.isEmpty()) {
             throw new PedidoNaoEncontradoException();
         }
-        return this.atualizarPedido(pedidoOptional.get(), TipoAtualizacao.P);
-    }
 
-    @Override
-    public Pedido atualizarPedidoFila(UUID idPedido, StatusPedido statusPedido) {
-        Optional<Pedido> pedidoOptional = buscarPorId(idPedido);
+        Pedido pedidoExistente = pedidoOptional.get();
 
-        if (pedidoOptional.isEmpty()) {
-            throw new PedidoNaoEncontradoException();
-        }
-        return this.atualizarPedido(pedidoOptional.get(), TipoAtualizacao.F);
-    }
-
-    @Override
-    public Pedido atualizarPedidoDefault(Pedido pedido) {
-        Optional<Pedido> pedidoOptional = buscarPorId(pedido.getIdPedido());
-
-        if (pedidoOptional.isEmpty()) {
-            throw new PedidoNaoEncontradoException();
-        }
-        return this.atualizarPedido(pedidoOptional.get(), TipoAtualizacao.D);
-    }
-
-
-    public Pedido atualizarPedido(Pedido pedido, TipoAtualizacao tipoAtualizacao) {
-        Pedido existingPedido = checkPedidoStatus(pedido.getIdPedido());
-
-        if(tipoAtualizacao == TipoAtualizacao.F) {
-            existingPedido.setStatusPedido(pedido.getStatusPedido());
-        }
-
-        if(tipoAtualizacao == TipoAtualizacao.P ){
-            StatusPagamento status = StatusPagamento.APROVADO; //TODO por enquanto o retorno está mockado,
-            // chamar api de pagamento quando tiver pronto
-
-            switch (pedido.getStatusPagamento()) {
-                case APROVADO -> {
-                    pedido.setStatusPedido(StatusPedido.R);
-                    pedido.setStatusPagamento(status);
-
-                    //filaUseCasePort.inserirPedidoNaFila(pedido); TODO chamar api de fila
+        switch (tipoAtualizacao){
+            case F -> pedidoExistente.setStatusPedido(statusPedido);
+            case C -> {
+                if (pedidoExistente.getStatusPedido() != StatusPedido.A) {
+                    throw new PedidoOperacaoNaoSuportadaException("Pedido não está aberto para edição.");
                 }
-                case RECUSADO -> {
-                    pedido.setStatusPedido(StatusPedido.F);
-                    pedido.setStatusPagamento(status);
+                pedidoExistente.setStatusPagamento(StatusPagamento.PENDENTE);
+            }
+            case I -> {
+                if (pedidoExistente.getStatusPedido() != StatusPedido.A) {
+                    throw new PedidoOperacaoNaoSuportadaException("Pedido não está aberto para edição.");
                 }
+                pedidoExistente.setProdutos(pedidoRequest.getProdutos());
+                pedidoExistente.setValorPedido(pedidoRequest.getValorPedido());
+                pedidoExistente.setStatusPedido(pedidoRequest.getStatusPedido());
+                pedidoExistente.setDataAtualizacao(new Date());
+            }
+            case P -> this.atualizarStatusPagamento(pedidoExistente);
+        }
+
+        return this.atualizarPedido(pedidoExistente);
+    }
+
+    private Pedido atualizarStatusPagamento(Pedido pedido) {
+        StatusPagamento status = this.pagamentoRepositoryPort.consultaPagamento(pedido.getIdPedido());
+
+        switch (pedido.getStatusPagamento()) {
+            case APROVADO -> {
+                pedido.setStatusPedido(StatusPedido.R);
+                pedido.setStatusPagamento(status);
+                //filaUseCasePort.inserirPedidoNaFila(pedido); TODO chamar api de fila
+            }
+            case RECUSADO -> {
+                pedido.setStatusPedido(StatusPedido.F);
+                pedido.setStatusPagamento(StatusPagamento.RECUSADO);
+            }
+            case PENDENTE -> {
+                pedido.setStatusPedido(StatusPedido.A);
+                pedido.setStatusPagamento(StatusPagamento.PENDENTE);
             }
         }
 
-        existingPedido.setProdutos(pedido.getProdutos());
-        existingPedido.setValorPedido(pedido.getValorPedido());
-        existingPedido.setDataAtualizacao(new Date());
-
-        return pedidoRepositoryPort.atualizarPedido(existingPedido);
+        return pedido;
     }
 
+    @Override
+    public Pedido atualizarPedido(Pedido pedido) {
+        return pedidoRepositoryPort.atualizarPedido(pedido);
+    }
 
     @Override
     public Optional<Pedido> buscarPorId(UUID id) {
@@ -104,29 +105,7 @@ public class PedidoUseCaseImpl implements IPedidoUseCasePort {
     }
 
     @Override
-    public Pedido checkout(UUID id) {
-        Pedido pedido = checkPedidoStatus(id);
-        pedido.setDataAtualizacao(new Date());
-        pedidoRepositoryPort.atualizarPedido(pedido);
-        return pedido;
-    }
-
-    private Pedido checkPedidoStatus(UUID idPedido) {
-        Optional<Pedido> optionalPedido = pedidoRepositoryPort.buscarPorId(idPedido);
-
-        if (optionalPedido.isEmpty()) {
-            throw new PedidoNaoEncontradoException("Pedido não encontrado.");
-        }
-
-        if (optionalPedido.get().getStatusPedido() != StatusPedido.A) {
-            throw new PedidoOperacaoNaoSuportadaException("Pedido não está aberto para edição.");
-        }
-
-        return optionalPedido.get();
-    }
-
-    @Override
-    public List<Pedido> buscarPedidosPorStatus(StatusPedido statusPedido) {
-        return pedidoRepositoryPort.buscarPedidosPorStatus(statusPedido);
+    public List<Pedido> buscarTodos(int pageNumber, int pageSize) {
+        return pedidoRepositoryPort.buscarTodos(pageNumber, pageSize);
     }
 }

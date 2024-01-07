@@ -9,31 +9,39 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.lang.Nullable;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/tech-challenge")
+@RequestMapping("/tech-challenge/clientes")
 @RequiredArgsConstructor
 public class ClienteController {
 
     private final IClienteUseCasePort clienteUseCasePort;
 
-    @GetMapping(value = "/clientes/{id}", produces = "application/json")
-    public ResponseEntity<ClienteDTO> buscarPorId(@PathVariable(name = "id") UUID uuid) {
-        Optional<Cliente> cliente = clienteUseCasePort.buscarPorId(uuid);
-        return cliente
-                .map(value -> ResponseEntity.ok(new ClienteDTO().from(value)))
-                .orElseGet(() -> ResponseEntity.notFound().build());
+    @GetMapping(value = "/", produces = "application/json")
+    public ResponseEntity<List<ClienteDTO>> buscarTodos(@RequestParam @Nullable String cpf) {
+        if (Objects.isNull(cpf)){
+            return ResponseEntity.ok(clienteUseCasePort.bucarTodos()
+                    .stream()
+                    .map(obj -> new ClienteDTO().from(obj))
+                    .collect(Collectors.toList())
+            );
+        } else {
+            Optional<Cliente> cliente = clienteUseCasePort.buscarPorCpf(new Cpf(cpf));
+            return cliente
+                    .map(value -> ResponseEntity.ok(Arrays.asList(new ClienteDTO().from(value))))
+                    .orElseGet(() -> ResponseEntity.notFound().build());
+        }
     }
 
-    @PostMapping("/clientes")
+    @PostMapping("/")
     public ResponseEntity<?>  cadastrar(@RequestBody @Validated ClienteRequest clienteRequest) {
         if (Objects.nonNull(clienteRequest)) {
             Cliente clienteDb = clienteUseCasePort.cadastrar(clienteRequest.from(clienteRequest));
@@ -44,7 +52,16 @@ public class ClienteController {
         }
     }
 
-    @PostMapping("/clientes/{cpf}")
+    @GetMapping(value = "/{id}", produces = "application/json")
+    public ResponseEntity<ClienteDTO> buscarPorId(@PathVariable(name = "id") UUID uuid) {
+        Optional<Cliente> cliente = clienteUseCasePort.buscarPorId(uuid);
+        return cliente
+                .map(value -> ResponseEntity.ok(new ClienteDTO().from(value)))
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+
+    @PostMapping("/{cpf}")
     public ResponseEntity<?> identificarPorCpf(@PathVariable(name = "cpf") String cpf) {
         if (Objects.nonNull(cpf)) {
             Cliente clienteDb = clienteUseCasePort.identificarPorCpf(new Cpf(cpf));
@@ -55,7 +72,7 @@ public class ClienteController {
         }
     }
 
-    @PostMapping("/clientes/id")
+    @PostMapping("/id")
     public ResponseEntity<?> identificarSemCPF() {
         UUID idCliente = clienteUseCasePort.gerarId();
         URI uri = ServletUriComponentsBuilder.fromCurrentContextPath().path("/tech-challenge/clientes/{id}").buildAndExpand(idCliente).toUri();

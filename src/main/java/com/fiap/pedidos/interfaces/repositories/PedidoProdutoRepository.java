@@ -10,6 +10,5 @@ import java.util.UUID;
 
 @Repository
 public interface PedidoProdutoRepository extends JpaRepository<PedidoProdutoEntity, UUID> {
-    List<PedidoProdutoEntity> findByPedido(Pedido pedido);
 
 }
