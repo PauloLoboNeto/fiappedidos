@@ -1,10 +1,10 @@
 package com.fiap.pedidos.controllers.requestValidations;
 
-import aplbackfase2.utils.enums.TipoProduto;
 import com.fiap.pedidos.entities.DescricaoProduto;
 import com.fiap.pedidos.entities.NomeProduto;
 import com.fiap.pedidos.entities.Produto;
 import com.fiap.pedidos.entities.ValorProduto;
+import com.fiap.pedidos.utils.enums.TipoProduto;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;

@@ -51,14 +51,14 @@ public class ProdutoEntity {
 
     private Boolean ativo;
 
-    public Produto to(ProdutoEntity produtoEntity) {
+    public Produto to() {
         return Produto.builder()
-                .idProduto(produtoEntity.getIdProduto())
-                .nomeProduto(produtoEntity.getNomeProduto())
-                .descricaoProduto(produtoEntity.getDescricaoProduto())
-                .tipoProduto(TipoProduto.fromCodigo(produtoEntity.getTipoProduto()))
-                .valorProduto(produtoEntity.getValorProduto())
-                .ativo(produtoEntity.getAtivo())
+                .idProduto(this.getIdProduto())
+                .nomeProduto(this.getNomeProduto())
+                .descricaoProduto(this.getDescricaoProduto())
+                .tipoProduto(TipoProduto.fromCodigo(this.getTipoProduto()))
+                .valorProduto(this.getValorProduto())
+                .ativo(this.getAtivo())
                 .build();
     }
 

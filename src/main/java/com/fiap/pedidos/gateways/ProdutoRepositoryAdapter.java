@@ -21,6 +21,14 @@ public class ProdutoRepositoryAdapter implements IProdutoRepositoryPort {
 
     private final ProdutoRepository produtoRepository;
 
+
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<Produto> buscarPorId(UUID idProduto) {
+        return this.produtoRepository.findById(idProduto)
+                .map(ProdutoEntity::to);
+    }
+
     @Override
     @Transactional(readOnly = true)
     public List<Produto> listarProdutosPorTipo(TipoProduto tipoProduto) {
@@ -28,8 +36,12 @@ public class ProdutoRepositoryAdapter implements IProdutoRepositoryPort {
         final Optional<List<ProdutoEntity>> produtoEntityList = this.produtoRepository
                 .findAllByTipoProdutoAndAtivo(tipoProduto.getCodigo(), true);
 
-        if(produtoEntityList.isPresent())
-            produtoEntityList.get().forEach(produtoEntity -> produtoList.add(produtoEntity.to(produtoEntity)));
+        produtoEntityList.ifPresent(
+                produtoEntities ->
+                        produtoEntities.forEach(
+                                produtoEntity -> produtoList.add(produtoEntity.to())
+                        )
+        );
 
         return produtoList;
     }
@@ -38,7 +50,7 @@ public class ProdutoRepositoryAdapter implements IProdutoRepositoryPort {
     @Transactional()
     public Produto criarProduto(Produto produto) {
         ProdutoEntity produtoEntity = new ProdutoEntity().from(produto, true);
-        return this.produtoRepository.save(produtoEntity).to(produtoEntity);
+        return this.produtoRepository.save(produtoEntity).to();
     }
 
     @Override

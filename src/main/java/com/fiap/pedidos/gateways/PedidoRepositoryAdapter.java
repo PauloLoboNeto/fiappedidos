@@ -28,7 +28,6 @@ public class PedidoRepositoryAdapter implements IPedidoRepositoryPort {
     private final PedidoRepository pedidoRepository;
     private final PedidoProdutoRepository pedidoProdutoRepository;
 
-
     @Override
     @Transactional
     public Pedido cadastrar(Pedido pedido) {
@@ -38,10 +37,8 @@ public class PedidoRepositoryAdapter implements IPedidoRepositoryPort {
 
     @Override
     @Transactional
-    public Pedido atualizar(Pedido pedido) {
-        PedidoEntity existingPedidoEntity = this.pedidoRepository.findById(pedido.getIdPedido())
-                .orElseThrow(() -> new PedidoNaoEncontradoException("Pedido não encontrado, id: " + pedido.getIdPedido()));
-        existingPedidoEntity = existingPedidoEntity.from(pedido, false);
+    public Pedido atualizarPedido(Pedido pedido) {
+        PedidoEntity existingPedidoEntity = new PedidoEntity().from(pedido, false);
         return this.pedidoRepository.save(existingPedidoEntity).to();
     }
 
@@ -49,9 +46,9 @@ public class PedidoRepositoryAdapter implements IPedidoRepositoryPort {
     @Transactional
     public Pedido atualizarStatus(StatusPedido status, UUID idPedido) throws PedidoNaoEncontradoException {
         Pedido pedido = buscarPorId(idPedido)
-                .orElseThrow(() -> new PedidoNaoEncontradoException());
+                .orElseThrow(PedidoNaoEncontradoException::new);
         pedido.setStatusPedido(status);
-        return atualizar(pedido);
+        return atualizarPedido(pedido);
     }
 
     @Override
@@ -86,7 +83,7 @@ public class PedidoRepositoryAdapter implements IPedidoRepositoryPort {
     @Override
     @Transactional(readOnly = true)
     public Optional<Pedido> buscarPorId(UUID idPedido) {
-        return this.pedidoRepository.findByIdPedido(idPedido)
+        return this.pedidoRepository.findById(idPedido)
                 .map(PedidoEntity::to);
     }
 

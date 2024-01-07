@@ -7,6 +7,7 @@ import com.fiap.pedidos.utils.enums.TipoProduto;
 import lombok.RequiredArgsConstructor;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @RequiredArgsConstructor
@@ -27,5 +28,10 @@ public class ProdutoUseCaseImpl implements IProdutoUseCasePort {
     @Override
     public void deletarProduto(UUID idProduto) {
         produtoRepositoryPort.deletarProduto(idProduto);
+    }
+
+    @Override
+    public Optional<Produto> buscarPorId(UUID idProduto) {
+       return produtoRepositoryPort.buscarPorId(idProduto);
     }
 }

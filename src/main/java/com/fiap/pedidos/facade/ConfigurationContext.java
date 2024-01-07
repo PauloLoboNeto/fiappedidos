@@ -24,15 +24,15 @@ public class ConfigurationContext {
     }
 
     @Bean
-    public IPedidoUseCasePort pedidoUseCasePort(IPedidoRepositoryPort pedidoRepositoryPort,
-                                                IPedidoProdutoRepositoryPort pedidoProdutoRepositoryPort) {
-        return new PedidoUseCaseImpl(pedidoRepositoryPort, pedidoProdutoRepositoryPort);
+    public IPedidoUseCasePort pedidoUseCasePort(IPedidoRepositoryPort pedidoRepositoryPort) {
+        return new PedidoUseCaseImpl(pedidoRepositoryPort);
     }
 
     @Bean
-    public IPedidoProdutoUseCasePort pedidoProdutoUseCasePort(IPedidoRepositoryPort pedidoRepositoryPort,
-                                                              IPedidoProdutoRepositoryPort pedidoProdutoRepositoryPort) {
-        return new PedidoProdutoUseCaseImpl(pedidoRepositoryPort, pedidoProdutoRepositoryPort);
+    public IPedidoProdutoUseCasePort pedidoProdutoUseCasePort(IPedidoUseCasePort pedidoUseCasePort,
+                                                              IPedidoProdutoRepositoryPort pedidoProdutoRepositoryPort,
+                                                              IProdutoUseCasePort produtoUseCasePort) {
+        return new PedidoProdutoUseCaseImpl(pedidoProdutoRepositoryPort, pedidoUseCasePort, produtoUseCasePort);
     }
 
     @Bean

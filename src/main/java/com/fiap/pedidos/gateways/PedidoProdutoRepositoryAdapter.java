@@ -2,6 +2,7 @@ package com.fiap.pedidos.gateways;
 
 import com.fiap.pedidos.entities.Pedido;
 import com.fiap.pedidos.entities.PedidoProduto;
+import com.fiap.pedidos.entities.Produto;
 import com.fiap.pedidos.exceptions.entities.PedidoNaoEncontradoException;
 import com.fiap.pedidos.exceptions.entities.PedidoOperacaoNaoSuportadaException;
 import com.fiap.pedidos.exceptions.entities.PedidoProdutoNaoEncontradoException;
@@ -60,67 +61,38 @@ public class PedidoProdutoRepositoryAdapter implements IPedidoProdutoRepositoryP
 
     @Override
     @Transactional
-    public PedidoProduto adicionarPedidoProduto(PedidoProduto pedidoProduto) {
-        PedidoEntity existPedioEntity = pedidoRepository.findById(pedidoProduto.getPedidoId())
-                .orElseThrow(() -> new PedidoNaoEncontradoException("Pedido não encontrado, id: " + pedidoProduto.getPedidoId()));
-        ProdutoEntity existProdutoEntity = produtoRepository.findById(pedidoProduto.getProdutoId())
-                .orElseThrow(() -> new PedidoProdutoNaoEncontradoException("Produto não encontrado, id: " + pedidoProduto.getProdutoId()));
+    public PedidoProduto adicionarPedidoProduto(Pedido pedido, Produto produto, PedidoProduto pedidoProduto) {
+
+        ProdutoEntity existProdutoEntity = new ProdutoEntity().from(produto, false);
+        PedidoEntity pedidoEntity = new PedidoEntity().from(pedido, false);
 
         PedidoProdutoEntity pedidoProdutoEntity = PedidoProdutoEntity.builder()
                 .id(pedidoProduto.getId())
-                .pedido(existPedioEntity)
+                .pedido(pedidoEntity)
                 .produto(existProdutoEntity)
-                .valorProduto(pedidoProduto.getValorProduto())
-                .observacaoProduto(pedidoProduto.getObservacaoProduto())
                 .build();
 
-        existPedioEntity.setDataAtualizacao(new Date());
-        pedidoRepository.save(existPedioEntity);
-
         return PedidoProdutoEntity.to(this.pedidoProdutoRepository.save(pedidoProdutoEntity));
-    }
-
-
-    @Override
-    @Transactional
-    public PedidoProduto editarPedidoProduto(PedidoProduto pedidoProduto) {
-        PedidoProdutoEntity existingPedidoProdutoEntity = this.pedidoProdutoRepository.findById(pedidoProduto.getId())
-                .orElseThrow(() -> new PedidoProdutoNaoEncontradoException("PedidoProduto não encontrado, id: " + pedidoProduto.getId()));
-        PedidoEntity existPedioEntity = pedidoRepository.findById(pedidoProduto.getPedidoId())
-                .orElseThrow(() -> new PedidoNaoEncontradoException("Pedido não encontrado, id: " + pedidoProduto.getPedidoId()));
-        ProdutoEntity existProdutoEntity = produtoRepository.findById(existingPedidoProdutoEntity.getProduto().getIdProduto())
-                .orElseThrow(() -> new PedidoProdutoNaoEncontradoException("Produto não encontrado, id: " + pedidoProduto.getProdutoId()));
-
-        existingPedidoProdutoEntity.setPedido(existPedioEntity);
-        existingPedidoProdutoEntity.setProduto(existProdutoEntity);
-        existingPedidoProdutoEntity.setValorProduto(pedidoProduto.getValorProduto());
-        existingPedidoProdutoEntity.setObservacaoProduto(pedidoProduto.getObservacaoProduto());
-
-        PedidoProdutoEntity updatedPedidoProdutoEntity = this.pedidoProdutoRepository.save(existingPedidoProdutoEntity);
-
-        existPedioEntity.setDataAtualizacao(new Date());
-        pedidoRepository.save(existPedioEntity);
-
-        return PedidoProdutoEntity.to(updatedPedidoProdutoEntity);
     }
 
     @Override
     @Transactional
     public void excluirPedidoProduto(UUID id) {
         Optional<PedidoProdutoEntity> pedidoProdutoOptional = pedidoProdutoRepository.findById(id);
+
         if (pedidoProdutoOptional.isPresent()) {
-            PedidoProdutoEntity pedidoProdutoEntity = pedidoProdutoOptional.get();
-            Optional<PedidoEntity> pedidoOptional = pedidoRepository.findById(pedidoProdutoEntity.getPedido().getIdPedido());
-            if (pedidoOptional.isPresent()) {
-                PedidoEntity pedidoEntity = pedidoOptional.get();
-                if (pedidoEntity.getStatusPedido() == StatusPedido.A) {
-                    pedidoProdutoRepository.deleteById(id);
-                    pedidoEntity.setDataAtualizacao(new Date());
-                    pedidoRepository.save(pedidoEntity);
-                } else {
-                    throw new PedidoOperacaoNaoSuportadaException("Pedido status is not A, id: " + pedidoEntity.getIdPedido());
-                }
-                }
+            Optional<PedidoEntity> pedidoOptional = pedidoRepository
+                    .findById(pedidoProdutoOptional.get().getPedido().getIdPedido());
+
+            if(pedidoOptional.isEmpty()){
+                throw new PedidoNaoEncontradoException();
             }
+
+            if(pedidoOptional.get().getStatusPedido() == StatusPedido.A) {
+                throw new PedidoOperacaoNaoSuportadaException("Pedido status is not A, id: " + pedidoOptional.get().getIdPedido());
+            }
+
+            pedidoProdutoRepository.deleteById(id);
         }
     }
+}

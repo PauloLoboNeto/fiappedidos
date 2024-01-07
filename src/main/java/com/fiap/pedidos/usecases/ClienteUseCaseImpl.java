@@ -43,10 +43,10 @@ public class ClienteUseCaseImpl implements IClienteUseCasePort {
         return clienteRepositoryPort.buscarPorCpf(cpf);
     }
 
-    @Override
-    public List<Cliente> bucarTodos() { // TODO - temp remover posteriormente
-        return clienteRepositoryPort.bucarTodos();
-    }
+//    @Override
+//    public List<Cliente> bucarTodos() { // TODO - temp remover posteriormente
+//        return clienteRepositoryPort.bucarTodos();
+//    }
 
     @Override
     public Optional<Cliente> buscarPorId(UUID uuid) {

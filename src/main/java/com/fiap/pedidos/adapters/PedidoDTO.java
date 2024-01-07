@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -30,14 +31,14 @@ public class PedidoDTO {
 
     public static PedidoDTO from(Pedido pedido) {
         List<PedidoProdutoDTO> pedidoProdutoDTO = null;
-        if (pedido.getProdutos() != null) {
+        if (Objects.nonNull(pedido.getProdutos())) {
             pedidoProdutoDTO = pedido.getProdutos().stream()
                     .map(PedidoProdutoDTO::from)
                     .collect(Collectors.toList());
         }
         return PedidoDTO.builder()
                 .idPedido(pedido.getIdPedido())
-                .idCliente(pedido.getIdCliente())
+                .idCliente(pedido.getCliente().getId())
                 .pedidoProdutos(pedidoProdutoDTO)
                 .statusPedido(pedido.getStatusPedido())
                 .statusPagamento(pedido.getStatusPagamento())

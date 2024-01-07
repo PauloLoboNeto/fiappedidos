@@ -13,7 +13,6 @@ import java.util.UUID;
 
 @Repository
 public interface PedidoRepository extends JpaRepository<PedidoEntity, UUID> {
-    Optional<PedidoEntity> findByIdPedido(UUID idPedido);
 
     @Query("SELECT p FROM PedidoEntity p WHERE id_cliente = ?1")
     List<PedidoEntity> findByIdCliente(UUID idCliente);

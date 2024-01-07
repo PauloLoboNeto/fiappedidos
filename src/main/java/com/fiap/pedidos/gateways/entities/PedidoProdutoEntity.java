@@ -1,5 +1,6 @@
 package com.fiap.pedidos.gateways.entities;
 
+import com.fiap.pedidos.entities.NomeProduto;
 import com.fiap.pedidos.entities.PedidoProduto;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -31,20 +32,11 @@ public class PedidoProdutoEntity {
     @JoinColumn(name = "id_produto")
     private ProdutoEntity produto;
 
-    @Column(name = "v_produto")
-    private BigDecimal valorProduto;
-
-    @Column(name = "txt_obs_produto")
-    private String observacaoProduto;
-
     public static PedidoProduto to(PedidoProdutoEntity pedidoProdutoEntity) {
         return PedidoProduto.builder()
                 .id(pedidoProdutoEntity.getId())
                 .pedidoId(pedidoProdutoEntity.getPedido().getIdPedido())
                 .produtoId(pedidoProdutoEntity.getProduto().getIdProduto())
-                .produtoDescricao(pedidoProdutoEntity.getProduto().getDescricaoProduto())
-                .valorProduto(pedidoProdutoEntity.getValorProduto())
-                .observacaoProduto(pedidoProdutoEntity.getObservacaoProduto())
                 .build();
     }
 
@@ -53,8 +45,6 @@ public class PedidoProdutoEntity {
                 .id(pedidoProduto.getId())
                 .pedido(pedidoEntity)
                 .produto(produtoEntity)
-                .valorProduto(pedidoProduto.getValorProduto())
-                .observacaoProduto(pedidoProduto.getObservacaoProduto())
                 .build();
     }
 }

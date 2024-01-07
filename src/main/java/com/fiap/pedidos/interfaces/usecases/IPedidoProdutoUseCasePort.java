@@ -8,7 +8,6 @@ import java.util.UUID;
 
 public interface IPedidoProdutoUseCasePort {
 
-    Optional<PedidoProduto> buscarPorId(UUID id);
-    PedidoProduto adicionarPedidoProduto(PedidoProduto pedidoProduto);
-    void  deletarPedidoProduto(UUID idPedidoProduto);
+    void adicionarItemNoPedido(PedidoProduto pedidoProduto);
+    void  removerItemDoPedido(PedidoProduto pedidoProduto);
 }

@@ -1,7 +1,6 @@
 package com.fiap.pedidos.controllers;
 
 import com.fiap.pedidos.adapters.PedidoDTO;
-import com.fiap.pedidos.adapters.PedidoProdutoDTO;
 import com.fiap.pedidos.controllers.requestValidations.PedidoProdutoRequest;
 import com.fiap.pedidos.controllers.requestValidations.PedidoRequest;
 import com.fiap.pedidos.entities.Cliente;
@@ -10,7 +9,6 @@ import com.fiap.pedidos.entities.PedidoProduto;
 import com.fiap.pedidos.interfaces.usecases.IClienteUseCasePort;
 import com.fiap.pedidos.interfaces.usecases.IPedidoProdutoUseCasePort;
 import com.fiap.pedidos.interfaces.usecases.IPedidoUseCasePort;
-import com.fiap.pedidos.utils.enums.StatusPagamento;
 import com.fiap.pedidos.utils.enums.StatusPedido;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -34,68 +33,71 @@ public class PedidoController {
 
     @PostMapping("/pedido")
     public ResponseEntity<PedidoDTO> iniciarPedido(@RequestBody @NotNull PedidoRequest request) {
-        if (request.getIdCliente() == null) {
+        Optional<Cliente> cliente = clienteUseCasePort.buscarPorId(request.getIdCliente());
+
+        if (cliente.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-        Optional<Cliente> cliente = clienteUseCasePort.buscarPorId(request.getIdCliente()); // TODO chamar serviço de clientes
-        if (!cliente.isPresent()) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
+
         Pedido pedido = this.pedidoUseCasePort.cadastrar(request.from(request, cliente.get()));
-        if (pedido != null) {
-            return new ResponseEntity<>(PedidoDTO.from(pedido), HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
+
+        return Objects.nonNull(pedido) ?
+                new ResponseEntity<>(PedidoDTO.from(pedido), HttpStatus.OK) :
+                new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
     @PostMapping("/pedido/{id}")
-    public ResponseEntity<PedidoProdutoDTO> adicionarProdutoAoPedido(
+    public ResponseEntity<PedidoDTO> adicionarItem(
             @PathVariable UUID idPedido, @RequestBody @NotNull PedidoProdutoRequest request) {
-        PedidoProduto pedidoProduto = request.from(request);
-        pedidoProduto.setPedidoId(idPedido);
-        PedidoProduto addedPedidoProduto = pedidoProdutoUseCasePort.adicionarPedidoProduto(pedidoProduto);
-        if (addedPedidoProduto != null) {
-            PedidoProdutoDTO pedidoProdutoDTO = PedidoProdutoDTO.from(addedPedidoProduto);
-            return new ResponseEntity<>(pedidoProdutoDTO, HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
+
+        //todo validar produto antes de incluir ao pedido
+
+        PedidoProduto pedidoProduto = request.from(request, idPedido);
+
+        pedidoProdutoUseCasePort.adicionarItemNoPedido(pedidoProduto);
+
+        Optional<Pedido> pedido = this.pedidoUseCasePort.buscarPorId(pedidoProduto.getPedidoId());
+
+        return pedido
+                .map(value ->  new ResponseEntity<>(PedidoDTO.from(value), HttpStatus.OK))
+                .orElseGet(() -> new ResponseEntity<>(HttpStatus.BAD_REQUEST));
     }
 
     //remover item do pedido
-    @DeleteMapping("/pedido/{idPedido}/produto/{id}")
-    public ResponseEntity<PedidoDTO> excluirProdutoDoPedido(@PathVariable UUID idPedido, @PathVariable UUID id) {
-        pedidoProdutoUseCasePort.deletarPedidoProduto(id);
-        Optional<Pedido> pedidoOptional = pedidoUseCasePort.buscarPorId(idPedido);
-        if (pedidoOptional.isPresent()) {
-            Pedido pedido = pedidoOptional.get();
-            PedidoDTO pedidoDTO = PedidoDTO.from(pedido);
-            return new ResponseEntity<>(pedidoDTO, HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-    }
+    @DeleteMapping("/pedido/{id}")
+    public ResponseEntity<PedidoDTO> removerItem(
+            @PathVariable UUID idPedido,
+            @RequestBody @NotNull PedidoProdutoRequest request) {
 
-    //buscar pedido por id
-    @GetMapping("/pedidos/{id}")
-    public ResponseEntity<PedidoDTO> buscarPedidoPorId(@PathVariable UUID id) {
-        return pedidoUseCasePort.buscarPorId(id)
+        PedidoProduto pedidoProduto = request.from(request, idPedido);
+        pedidoProduto.setPedidoId(idPedido);
+
+        pedidoProdutoUseCasePort.removerItemDoPedido(pedidoProduto);
+
+        Optional<Pedido> pedidoOptional = pedidoUseCasePort.buscarPorId(pedidoProduto.getPedidoId());
+
+        return pedidoOptional
                 .map(pedido -> new ResponseEntity<>(PedidoDTO.from(pedido), HttpStatus.OK))
                 .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
+
     }
 
+    //Utilizado pelo app de fila ao atualizar fila
     @PutMapping("/pedido/{idPedido}/status/{status}")
     public ResponseEntity<PedidoDTO> atualizarStatusDoPedido(
-            @PathVariable UUID idPedido, @PathVariable StatusPedido status) {
-        PedidoDTO pedidoDTO = PedidoDTO.from(pedidoUseCasePort.atualizarStatus(status, idPedido));
+            @PathVariable UUID idPedido,
+            @PathVariable StatusPedido status) {
+
+        PedidoDTO pedidoDTO = PedidoDTO.from(pedidoUseCasePort.atualizarPedidoFila(idPedido, status));
         return ResponseEntity.ok().body(pedidoDTO);
     }
 
+    //Utilizado pelo app de pagamentos ao atualizar status do pagamento
     @PostMapping("/pedido/checkout/{idPedido}")
     public ResponseEntity<PedidoDTO> checkout(@PathVariable UUID idPedido) {
         return new ResponseEntity<>(PedidoDTO.from(pedidoUseCasePort.checkout(idPedido)), HttpStatus.OK);
     }
+
 
     @GetMapping("/pedidos")
     public ResponseEntity<List<PedidoDTO>> buscarTodos(
@@ -111,7 +113,7 @@ public class PedidoController {
     @PutMapping("/pedido/{idPedido}/webhook")
     public ResponseEntity<PedidoDTO> atualizarStatusDoPagamentoDoPedido(
             @PathVariable UUID idPedido) {
-        PedidoDTO pedidoDTO = PedidoDTO.from(pedidoUseCasePort.atualizarStatusPagamento(idPedido));
+        PedidoDTO pedidoDTO = PedidoDTO.from(pedidoUseCasePort.atualizarPedidoPagamento(idPedido));
         return ResponseEntity.ok().body(pedidoDTO);
     }
 }
