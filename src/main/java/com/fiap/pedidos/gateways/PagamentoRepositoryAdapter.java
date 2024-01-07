@@ -1,7 +1,7 @@
 package com.fiap.pedidos.gateways;
 
 import com.fiap.pedidos.interfaces.gateways.IPagamentoRepositoryPort;
-import com.fiap.pedidos.interfaces.repositories.IPagamentoRepository;
+import com.fiap.pedidos.interfaces.repositories.PagamentoRepository;
 import com.fiap.pedidos.utils.enums.StatusPagamento;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -12,7 +12,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class PagamentoRepositoryAdapter implements IPagamentoRepositoryPort {
 
-    private final IPagamentoRepository pagamentoRepository;
+    private final PagamentoRepository pagamentoRepository;
     @Override
     public StatusPagamento consultaPagamento(UUID idPedido) {
         return this.pagamentoRepository.consultarPagamento();

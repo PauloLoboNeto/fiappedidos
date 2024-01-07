@@ -11,7 +11,6 @@ import com.fiap.pedidos.gateways.entities.ProdutoEntity;
 import com.fiap.pedidos.interfaces.gateways.IPedidoProdutoRepositoryPort;
 import com.fiap.pedidos.interfaces.repositories.PedidoProdutoRepository;
 import com.fiap.pedidos.interfaces.repositories.PedidoRepository;
-import com.fiap.pedidos.interfaces.repositories.ProdutoRepository;
 import com.fiap.pedidos.utils.enums.StatusPedido;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -26,7 +25,6 @@ public class PedidoProdutoRepositoryAdapter implements IPedidoProdutoRepositoryP
 
     private final PedidoProdutoRepository pedidoProdutoRepository;
     private final PedidoRepository pedidoRepository;
-    private final ProdutoRepository produtoRepository;
 
     @Override
     @Transactional(readOnly = true)

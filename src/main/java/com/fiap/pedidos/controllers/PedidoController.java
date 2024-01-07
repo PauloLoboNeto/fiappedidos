@@ -17,11 +17,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/tech-challenge")
@@ -92,14 +90,14 @@ public class PedidoController {
         return ResponseEntity.ok().body(pedidoDTO);
     }
 
-    @GetMapping("/pedidos")
-    public ResponseEntity<List<PedidoDTO>> buscarTodos(
-            @RequestParam(defaultValue = "0") int pageNumber,
-            @RequestParam(defaultValue = "100") int pageSize) {
-        List<Pedido> pedidos = pedidoUseCasePort.buscarTodos(pageNumber, pageSize);
-        List<PedidoDTO> pedidoDTOs = pedidos.stream()
-                .map(PedidoDTO::from)
-                .collect(Collectors.toList());
-        return new ResponseEntity<>(pedidoDTOs, HttpStatus.OK);
-    }
+//    @GetMapping("/pedidos")
+//    public ResponseEntity<List<PedidoDTO>> buscarTodos(
+//            @RequestParam(defaultValue = "0") int pageNumber,
+//            @RequestParam(defaultValue = "100") int pageSize) {
+//        List<Pedido> pedidos = pedidoUseCasePort.buscarTodos(pageNumber, pageSize);
+//        List<PedidoDTO> pedidoDTOs = pedidos.stream()
+//                .map(PedidoDTO::from)
+//                .collect(Collectors.toList());
+//        return new ResponseEntity<>(pedidoDTOs, HttpStatus.OK);
+//    }
 }
