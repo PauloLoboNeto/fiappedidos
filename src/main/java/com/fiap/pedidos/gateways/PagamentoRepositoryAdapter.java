@@ -13,13 +13,13 @@ import java.util.UUID;
 public class PagamentoRepositoryAdapter implements IPagamentoRepositoryPort {
 
     private final PagamentoRepository pagamentoRepository;
-    @Override
-    public StatusPagamento consultaPagamento(UUID idPedido) {
-        return this.pagamentoRepository.consultarPagamento();
-    }
-//
 //    @Override
 //    public StatusPagamento consultaPagamento(UUID idPedido) {
-//        return StatusPagamento.APROVADO;
+//        return this.pagamentoRepository.consultarPagamento();
 //    }
+//
+    @Override
+    public StatusPagamento consultaPagamento(UUID idPedido) {
+        return StatusPagamento.APROVADO;
+    }
 }

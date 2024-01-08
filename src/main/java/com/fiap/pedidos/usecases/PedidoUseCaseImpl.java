@@ -11,9 +11,8 @@ import com.fiap.pedidos.utils.enums.StatusPedido;
 import com.fiap.pedidos.utils.enums.TipoAtualizacao;
 import lombok.RequiredArgsConstructor;
 
-import java.util.Date;
-import java.util.Optional;
-import java.util.UUID;
+import java.math.BigDecimal;
+import java.util.*;
 
 @RequiredArgsConstructor
 public class PedidoUseCaseImpl implements IPedidoUseCasePort {
@@ -23,17 +22,18 @@ public class PedidoUseCaseImpl implements IPedidoUseCasePort {
 
     @Override
     public Pedido iniciarPedido(Pedido pedido) {
-//        UUID idCliente = pedido.getCliente().getId();
+        UUID idCliente = pedido.getCliente().getId();
 
-//        List<Pedido> pedidosAtivos = this.pedidoRepositoryPort
-//                .buscarPedidosPorClienteEStatus(idCliente, StatusPedido.A);
+        List<Pedido> pedidosAtivos = this.pedidoRepositoryPort
+                .buscarPedidosPorClienteEStatus(idCliente, StatusPedido.A);
 
-//        if (pedidosAtivos.isEmpty()) {
-        return pedidoRepositoryPort.cadastrar(pedido);
-//        }
+        if (pedidosAtivos.isEmpty()) {
+            pedido.setValorPedido(new BigDecimal("0.0"));
+            return pedidoRepositoryPort.cadastrar(pedido);
+        }
 
-//        pedidosAtivos.sort(Comparator.comparing(Pedido::getDataInclusao).reversed());
-//        return pedidosAtivos.get(0);
+        pedidosAtivos.sort(Comparator.comparing(Pedido::getDataInclusao).reversed());
+        return pedidosAtivos.get(0);
     }
 
     @Override
@@ -74,10 +74,10 @@ public class PedidoUseCaseImpl implements IPedidoUseCasePort {
         return this.atualizarPedido(pedidoExistente);
     }
 
-    private Pedido atualizarStatusPagamento(Pedido pedido) {
+    private void atualizarStatusPagamento(Pedido pedido) {
         StatusPagamento status = this.pagamentoRepositoryPort.consultaPagamento(pedido.getIdPedido());
 
-        switch (pedido.getStatusPagamento()) {
+        switch (status) {
             case APROVADO -> {
                 pedido.setStatusPedido(StatusPedido.R);
                 pedido.setStatusPagamento(status);
@@ -92,8 +92,6 @@ public class PedidoUseCaseImpl implements IPedidoUseCasePort {
                 pedido.setStatusPagamento(StatusPagamento.PENDENTE);
             }
         }
-
-        return pedido;
     }
 
     @Override
@@ -106,8 +104,8 @@ public class PedidoUseCaseImpl implements IPedidoUseCasePort {
         return pedidoRepositoryPort.buscarPorId(id);
     }
 
-//    @Override
-//    public List<Pedido> buscarTodos(int pageNumber, int pageSize) {
-//        return pedidoRepositoryPort.buscarTodos(pageNumber, pageSize);
-//    }
+    @Override
+    public List<Pedido> buscarTodos(int pageNumber, int pageSize) {
+        return pedidoRepositoryPort.buscarTodos(pageNumber, pageSize);
+    }
 }

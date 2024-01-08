@@ -64,6 +64,7 @@ public class ProdutoEntity {
 
     public ProdutoEntity from(Produto produto, boolean isCreated) {
         ProdutoEntityBuilder produtoEntityBuilder = ProdutoEntity.builder()
+                .idProduto(produto.getIdProduto())
                 .nomeProduto(produto.getNomeProduto())
                 .descricaoProduto(produto.getDescricaoProduto())
                 .tipoProduto(produto.getTipoProduto().getCodigo())

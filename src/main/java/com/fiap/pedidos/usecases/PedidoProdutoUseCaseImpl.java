@@ -26,8 +26,8 @@ public class PedidoProdutoUseCaseImpl implements IPedidoProdutoUseCasePort {
 
     @Override
     public Pedido adicionarItemNoPedido(PedidoProduto pedidoProduto) {
-        Optional<PedidoProduto> optionalPedidoProduto = pedidoProdutoRepositoryPort.buscarPorId(pedidoProduto.getId());
-        validarPedidoProduto(optionalPedidoProduto);
+//        Optional<PedidoProduto> optionalPedidoProduto = pedidoProdutoRepositoryPort.buscarPorId(pedidoProduto.getId());
+//        validarPedidoProduto(optionalPedidoProduto);
 
         Optional<Pedido> optionalPedido = pedidoUseCasePort.buscarPorId(pedidoProduto.getPedidoId());
         validarPedido(optionalPedido);
@@ -38,15 +38,17 @@ public class PedidoProdutoUseCaseImpl implements IPedidoProdutoUseCasePort {
         Pedido pedido = optionalPedido.get();
         Produto produto = optionalProduto.get();
 
-        pedidoProdutoRepositoryPort.adicionarPedidoProduto(pedido, produto, pedidoProduto);
-
         pedido.setDataAtualizacao(new Date());
         pedido.setValorPedido(
                 pedido.getValorPedido()
                         .add(produto.getValorProduto().getValorProduto())
         );
 
-       return pedidoUseCasePort.atualizarPedido(pedido);
+        pedido = pedidoUseCasePort.atualizarPedido(pedido);
+
+        pedidoProdutoRepositoryPort.adicionarPedidoProduto(pedido, produto, pedidoProduto);
+
+        return pedido;
     }
 
     @Override

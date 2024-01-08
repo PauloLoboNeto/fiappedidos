@@ -8,6 +8,8 @@ import com.fiap.pedidos.interfaces.repositories.PedidoProdutoRepository;
 import com.fiap.pedidos.interfaces.repositories.PedidoRepository;
 import com.fiap.pedidos.utils.enums.StatusPedido;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -49,14 +51,14 @@ public class PedidoRepositoryAdapter implements IPedidoRepositoryPort {
         this.pedidoRepository.delete(pedidoEntity);
     }
 
-//    @Override
-//    @Transactional(readOnly = true)
-//    public List<Pedido> buscarTodos(int pageNumber, int pageSize) {
-//        Pageable pageable = PageRequest.of(pageNumber, pageSize);
-//        return this.pedidoRepository.listagemOrdenadaPorStatusExcluindoFinalizados(pageable).stream()
-//                .map(PedidoEntity::to)
-//                .collect(Collectors.toList());
-//    }
+    @Override
+    @Transactional(readOnly = true)
+    public List<Pedido> buscarTodos(int pageNumber, int pageSize) {
+        Pageable pageable = PageRequest.of(pageNumber, pageSize);
+        return this.pedidoRepository.listagemOrdenadaPorStatusExcluindoFinalizados(pageable).stream()
+                .map(PedidoEntity::to)
+                .collect(Collectors.toList());
+    }
 
     @Override
     @Transactional(readOnly = true)
@@ -65,11 +67,12 @@ public class PedidoRepositoryAdapter implements IPedidoRepositoryPort {
                 .map(PedidoEntity::to);
     }
 
-//    @Override
-//    @Transactional(readOnly = true)
-//    public List<Pedido> buscarPedidosPorClienteEStatus(UUID idCliente, StatusPedido statusPedido) {
-//        return this.pedidoRepository.findByIdClienteAndStatusPedido(idCliente, statusPedido.toString()).stream()
-//                .map(PedidoEntity::to)
-//                .collect(Collectors.toList());
-//    }
+    @Override
+    @Transactional(readOnly = true)
+    public List<Pedido> buscarPedidosPorClienteEStatus(UUID idCliente, StatusPedido statusPedido) {
+        return this.pedidoRepository.findByIdClienteAndStatusPedido(idCliente, statusPedido.toString())
+                .stream()
+                .map(PedidoEntity::to)
+                .collect(Collectors.toList());
+    }
 }
