@@ -14,6 +14,7 @@ import com.fiap.pedidos.utils.enums.TipoAtualizacao;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,7 +25,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/tech-challenge")
+@RequestMapping("/pedidos")
 @RequiredArgsConstructor
 public class PedidoController {
 
@@ -32,7 +33,9 @@ public class PedidoController {
     private final IPedidoProdutoUseCasePort pedidoProdutoUseCasePort;
     private final IClienteUseCasePort clienteUseCasePort;
 
-    @PostMapping("/pedido")
+    @PostMapping(value = "/",
+            produces = MediaType.APPLICATION_JSON_VALUE,
+            consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<PedidoDTO> iniciarPedido(@RequestBody @NotNull PedidoRequest request) {
         Optional<Cliente> cliente = clienteUseCasePort.buscarPorId(request.getIdCliente());
 
@@ -47,7 +50,9 @@ public class PedidoController {
                 new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
-    @PostMapping("/pedido/{id}")
+    @PostMapping(value = "/{id}",
+            produces = MediaType.APPLICATION_JSON_VALUE,
+            consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<PedidoDTO> adicionarItem(
             @PathVariable UUID idPedido, @RequestBody @NotNull PedidoProdutoRequest request) {
         PedidoProduto pedidoProduto = request.from(request, idPedido);
@@ -56,7 +61,7 @@ public class PedidoController {
     }
 
     //remover item do pedido
-    @DeleteMapping("/pedido/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<PedidoDTO> removerItem(
             @PathVariable UUID idPedido,
             @RequestBody @NotNull PedidoProdutoRequest request) {
@@ -67,24 +72,31 @@ public class PedidoController {
     }
 
     //Utilizado pelo app de fila ao atualizar fila
-    @PutMapping("/pedido/{idPedido}/status/{status}")
+    @PutMapping(
+            value = "/{idPedido}/status/{status}",
+            produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<PedidoDTO> atualizarStatusDoPedido(
             @PathVariable UUID idPedido,
             @PathVariable StatusPedido status) {
-        PedidoDTO pedidoDTO = PedidoDTO.from(pedidoUseCasePort
-                .atualizarPedido(idPedido, TipoAtualizacao.F, null, status));
+        PedidoDTO pedidoDTO = PedidoDTO.from(
+                pedidoUseCasePort.atualizarPedido(
+                        idPedido,
+                        TipoAtualizacao.F,
+                        null,
+                        status)
+        );
         return ResponseEntity.ok().body(pedidoDTO);
     }
 
     //FinalizaPedido
-    @PostMapping("/pedido/checkout/{idPedido}")
+    @PostMapping("/checkout/{idPedido}")
     public ResponseEntity<PedidoDTO> checkout(@PathVariable UUID idPedido) {
         return new ResponseEntity<>(PedidoDTO.from(pedidoUseCasePort
                 .atualizarPedido(idPedido, TipoAtualizacao.C, null, null)), HttpStatus.OK);
     }
 
     //Utilizado pelo app de pagamentos ao atualizar status do pagamento
-    @PutMapping("/pedido/{idPedido}/webhook")
+    @PutMapping("/{idPedido}/webhook")
     public ResponseEntity<PedidoDTO> atualizarStatusDoPagamentoDoPedido(
             @PathVariable UUID idPedido) {
         PedidoDTO pedidoDTO = PedidoDTO.from(pedidoUseCasePort
@@ -92,7 +104,7 @@ public class PedidoController {
         return ResponseEntity.ok().body(pedidoDTO);
     }
 
-    @GetMapping("/pedidos")
+    @GetMapping("/")
     public ResponseEntity<List<PedidoDTO>> buscarTodos(
             @RequestParam(defaultValue = "0") int pageNumber,
             @RequestParam(defaultValue = "100") int pageSize) {
@@ -101,5 +113,12 @@ public class PedidoController {
                 .map(PedidoDTO::from)
                 .collect(Collectors.toList());
         return new ResponseEntity<>(pedidoDTOs, HttpStatus.OK);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<PedidoDTO> buscarPedido(
+            @PathVariable UUID idPedido) {
+        var pedidoDto = PedidoDTO.from(pedidoUseCasePort.buscarPorId(idPedido));
+        return new ResponseEntity<>(pedidoDto, HttpStatus.OK);
     }
 }

@@ -11,7 +11,7 @@ import java.util.UUID;
 public interface IPedidoUseCasePort {
     Pedido iniciarPedido(Pedido pedido);
 
-    Optional<Pedido> buscarPorId(UUID idPedido);
+   Pedido buscarPorId(UUID idPedido);
 
     List<Pedido> buscarTodos(int pageNumber, int pageSize);
 

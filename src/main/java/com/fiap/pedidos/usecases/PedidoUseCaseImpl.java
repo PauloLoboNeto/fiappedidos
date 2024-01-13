@@ -12,7 +12,10 @@ import com.fiap.pedidos.utils.enums.TipoAtualizacao;
 import lombok.RequiredArgsConstructor;
 
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.List;
+import java.util.UUID;
 
 @RequiredArgsConstructor
 public class PedidoUseCaseImpl implements IPedidoUseCasePort {
@@ -43,13 +46,7 @@ public class PedidoUseCaseImpl implements IPedidoUseCasePort {
             Pedido pedidoRequest,
             StatusPedido statusPedido) {
 
-        Optional<Pedido> pedidoOptional = buscarPorId(idPedido);
-
-        if (pedidoOptional.isEmpty()) {
-            throw new PedidoNaoEncontradoException();
-        }
-
-        Pedido pedidoExistente = pedidoOptional.get();
+        Pedido pedidoExistente = buscarPorId(idPedido);
 
         switch (tipoAtualizacao){
             case F -> pedidoExistente.setStatusPedido(statusPedido);
@@ -100,8 +97,14 @@ public class PedidoUseCaseImpl implements IPedidoUseCasePort {
     }
 
     @Override
-    public Optional<Pedido> buscarPorId(UUID id) {
-        return pedidoRepositoryPort.buscarPorId(id);
+    public Pedido buscarPorId(UUID id) {
+        var pedidoOptional = pedidoRepositoryPort.buscarPorId(id);
+
+        if (pedidoOptional.isEmpty()) {
+            throw new PedidoNaoEncontradoException();
+        }
+
+        return pedidoOptional.get();
     }
 
     @Override

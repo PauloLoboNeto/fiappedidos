@@ -4,7 +4,6 @@ public enum StatusPedido {
     A("Aberto"),
     R("Pagamento Recebido"),
     E("Em preparação"),
-    C("Concluído"),
     F("Finalizado");
 
     private final String descricao;

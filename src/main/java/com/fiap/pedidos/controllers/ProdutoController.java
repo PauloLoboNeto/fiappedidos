@@ -18,13 +18,13 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/tech-challenge")
+@RequestMapping("/produtos")
 @RequiredArgsConstructor
 public class ProdutoController {
 
     private final IProdutoUseCasePort produtoUseCasePort;
 
-    @GetMapping("/produtos")
+    @GetMapping("/")
     public ResponseEntity<List<ProdutoDTO>> buscarProduto(@RequestParam(value="tipo_produto") @Validated @NotBlank String tipoProduto) {
         List<Produto> produtoArrayList = this.produtoUseCasePort
                 .listarProdutosPorTipoProduto(TipoProduto.fromCodigo(tipoProduto));
@@ -33,13 +33,13 @@ public class ProdutoController {
         return new ResponseEntity<>(produtoDTOList, HttpStatus.OK);
     }
 
-    @PostMapping("/produtos")
+    @PostMapping("/")
     public ResponseEntity<?> criarProduto(@RequestBody @Validated ProdutoRequest request) {
         Produto produto = this.produtoUseCasePort.criarProduto(request.from(request));
         return new ResponseEntity<>(new ProdutoDTO().from(produto), HttpStatus.CREATED);
     }
 
-    @DeleteMapping("/produtos/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<?> deletarProduto(@PathVariable @NotNull UUID id) {
         this.produtoUseCasePort.deletarProduto(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);

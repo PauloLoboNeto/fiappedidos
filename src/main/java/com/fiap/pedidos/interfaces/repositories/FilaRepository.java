@@ -8,8 +8,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 
 import java.util.UUID;
 
-@FeignClient(name = "consulta-pagamento", url = "${pagamentos.service.url}")
-public interface PagamentoRepository {
-    @GetMapping("/{id}")
-    StatusPagamento consultarPagamento(@PathVariable("idPedido")UUID idPedido);
+@FeignClient(name = "insere-fila", url = "${fila.service.url}")
+public interface FilaRepository {
+    @PostMapping("/clientes/{idCliente}/pedidos/{idPedido}")
+    void inserePedidoNaFila(@PathVariable(name = "idPedido") UUID idPedido,
+                            @PathVariable(name = "idCliente") UUID idCliente);
 }
