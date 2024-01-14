@@ -102,6 +102,10 @@ public class PedidoUseCaseImpl implements IPedidoUseCasePort {
             throw new PedidoNaoEncontradoException();
         }
 
+        pedidoOptional
+                .get()
+                .setProdutos(this.pedidoProdutoRepositoryPort.obterTodosOsProdutosAssociadosAoPedidoPeloIdPedido(id));
+
         return pedidoOptional.get();
     }
 

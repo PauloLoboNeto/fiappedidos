@@ -6,6 +6,7 @@ import com.fiap.pedidos.controllers.requestValidations.PedidoRequest;
 import com.fiap.pedidos.entities.Cliente;
 import com.fiap.pedidos.entities.Pedido;
 import com.fiap.pedidos.entities.PedidoProduto;
+import com.fiap.pedidos.interfaces.facade.IServiceAsyncProcessWebhook;
 import com.fiap.pedidos.interfaces.usecases.IClienteUseCasePort;
 import com.fiap.pedidos.interfaces.usecases.IPedidoProdutoUseCasePort;
 import com.fiap.pedidos.interfaces.usecases.IPedidoUseCasePort;
@@ -17,6 +18,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -29,14 +31,16 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/pedidos")
 @RequiredArgsConstructor
+@EnableAsync
 public class PedidoController {
 
     private final IPedidoUseCasePort pedidoUseCasePort;
     private final IPedidoProdutoUseCasePort pedidoProdutoUseCasePort;
     private final IClienteUseCasePort clienteUseCasePort;
+    private final IServiceAsyncProcessWebhook serviceAsyncProcessWebhook;
 
     @GetMapping(value = {"/", ""}, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<PedidoDTO>> buscarTodos(
+    public ResponseEntity<List<PedidoDTO>> buscarTodosNaoFinalizados(
             @RequestParam(defaultValue = "0") int pageNumber,
             @RequestParam(defaultValue = "100") int pageSize) {
         List<Pedido> pedidos = pedidoUseCasePort.buscarTodos(pageNumber, pageSize);
@@ -117,11 +121,11 @@ public class PedidoController {
     }
 
     //Utilizado pelo app de pagamentos ao atualizar status do pagamento
-    @PutMapping(value = "/{idPedido}/webhook", produces = MediaType.APPLICATION_JSON_VALUE)
-    public CompletableFuture<ResponseEntity<String>> atualizarStatusDoPagamentoDoPedido(
+    @PutMapping(value = "/{idPedido}/webhook")
+    public ResponseEntity<String> atualizarStatusDoPagamentoDoPedido(
             @PathVariable UUID idPedido) {
-        PedidoDTO pedidoDTO = PedidoDTO.from(pedidoUseCasePort
-                .atualizarPedido(idPedido,TipoAtualizacao.P, null, null));
-        return CompletableFuture.completedFuture(new ResponseEntity<String>("Requisição recebida e processamento iniciado.", HttpStatus.OK));
+        this.serviceAsyncProcessWebhook.processarWebhook(idPedido);
+        return new ResponseEntity<String>("Requisição recebida e processamento iniciado.", HttpStatus.OK);
     }
+
 }

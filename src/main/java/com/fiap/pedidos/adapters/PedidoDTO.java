@@ -1,5 +1,6 @@
 package com.fiap.pedidos.adapters;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fiap.pedidos.entities.Pedido;
 import com.fiap.pedidos.utils.enums.StatusPagamento;
 import com.fiap.pedidos.utils.enums.StatusPedido;
@@ -22,7 +23,10 @@ import java.util.stream.Collectors;
 public class PedidoDTO {
     private UUID idPedido;
     private UUID idCliente;
+
+    @JsonInclude(JsonInclude.Include.NON_NULL) //Esconde pra quando retorna todos os pedidos.
     private List<ProdutoDTO> produtos;
+
     private StatusPedido statusPedido;
     private BigDecimal valorPedido;
     private Date dataInclusao;
