@@ -15,7 +15,7 @@ public final class Cpf {
 
     public Cpf(String cpf) {
         this.cpf = Objects.nonNull(cpf) ? cpf : "";
-        if (isValid()) {
+        if (!isValid()) {
             throw new CpfInvalidoException();
         }
     }

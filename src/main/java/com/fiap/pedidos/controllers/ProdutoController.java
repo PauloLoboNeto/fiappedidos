@@ -24,22 +24,26 @@ public class ProdutoController {
 
     private final IProdutoUseCasePort produtoUseCasePort;
 
-    @GetMapping("/")
-    public ResponseEntity<List<ProdutoDTO>> buscarProduto(@RequestParam(value="tipo_produto") @Validated @NotBlank String tipoProduto) {
+    @GetMapping(value = {"/", ""}, produces = "application/json")
+    public ResponseEntity<List<ProdutoDTO>> buscarProdutos(@RequestParam(value="tipo_produto") @Validated @NotBlank String tipoProduto) {
         List<Produto> produtoArrayList = this.produtoUseCasePort
                 .listarProdutosPorTipoProduto(TipoProduto.fromCodigo(tipoProduto));
         final var produtoDTOList = new ArrayList<ProdutoDTO>();
         produtoArrayList.forEach(produto -> produtoDTOList.add(new ProdutoDTO().from(produto)));
+
+        if(produtoDTOList.isEmpty())
+            return new ResponseEntity<>(produtoDTOList, HttpStatus.NO_CONTENT);
+
         return new ResponseEntity<>(produtoDTOList, HttpStatus.OK);
     }
 
-    @PostMapping("/")
+    @PostMapping(value = {"/", ""}, produces = "application/json")
     public ResponseEntity<?> criarProduto(@RequestBody @Validated ProdutoRequest request) {
         Produto produto = this.produtoUseCasePort.criarProduto(request.from(request));
         return new ResponseEntity<>(new ProdutoDTO().from(produto), HttpStatus.CREATED);
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping(value = "/{id}", produces = "application/json")
     public ResponseEntity<?> deletarProduto(@PathVariable @NotNull UUID id) {
         this.produtoUseCasePort.deletarProduto(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);

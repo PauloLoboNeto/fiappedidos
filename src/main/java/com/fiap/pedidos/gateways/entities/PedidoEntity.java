@@ -40,11 +40,6 @@ public class PedidoEntity {
     @NotNull
     private StatusPedido statusPedido;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "id_status_pagamento")
-    @NotNull
-    private StatusPagamento statusPagamento;
-
     @Column(name = "v_pedido")
     private BigDecimal valorPedido;
 
@@ -66,15 +61,13 @@ public class PedidoEntity {
         if (this.produtos != null) {
             pedidoProdutos = this.produtos.stream()
                     .map(PedidoProdutoEntity::to)
-                    .collect(Collectors.toList());
+                    .toList();
         }
         return Pedido.builder()
                 .idPedido(this.idPedido)
                 .cliente(new ClienteEntity().to(this.cliente))
                 .statusPedido(this.statusPedido)
-                .statusPagamento(this.statusPagamento)
                 .valorPedido(this.valorPedido)
-                .produtos(pedidoProdutos)
                 .dataInclusao(this.dataInclusao)
                 .dataAtualizacao(this.dataAtualizacao)
                 .build();
@@ -91,10 +84,8 @@ public class PedidoEntity {
         if(isCreated) {
             pedidoEntityBuilder.dataInclusao(this.obterDataHoraAtual());
             pedidoEntityBuilder.statusPedido(StatusPedido.A);
-            pedidoEntityBuilder.statusPagamento(StatusPagamento.PENDENTE);
         } else {
             pedidoEntityBuilder.statusPedido(pedido.getStatusPedido());
-            pedidoEntityBuilder.statusPagamento(pedido.getStatusPagamento());
         }
 
         return pedidoEntityBuilder.build();

@@ -20,7 +20,7 @@ public class ProdutoDTO {
     private String tipo;
     private BigDecimal valor;
 
-    public ProdutoDTO from(Produto produto) {
+    public static ProdutoDTO from(Produto produto) {
         return ProdutoDTO.builder()
                 .id(produto.getIdProduto())
                 .nome(produto.getNomeProduto().getNome())

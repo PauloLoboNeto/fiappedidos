@@ -1,8 +1,6 @@
 package com.fiap.pedidos.facade;
 
-import com.fiap.pedidos.gateways.PagamentoRepositoryAdapter;
 import com.fiap.pedidos.interfaces.gateways.*;
-import com.fiap.pedidos.interfaces.repositories.PagamentoRepository;
 import com.fiap.pedidos.interfaces.usecases.IClienteUseCasePort;
 import com.fiap.pedidos.interfaces.usecases.IPedidoProdutoUseCasePort;
 import com.fiap.pedidos.interfaces.usecases.IPedidoUseCasePort;
@@ -28,15 +26,19 @@ public class ConfigurationContext {
     }
 
     @Bean
-    public IPedidoUseCasePort pedidoUseCasePort(IPedidoRepositoryPort pedidoRepositoryPort, IPagamentoRepositoryPort pagamentoRepositoryPort) {
-        return new PedidoUseCaseImpl(pedidoRepositoryPort, pagamentoRepositoryPort);
+    public IPedidoUseCasePort pedidoUseCasePort(
+            IPedidoProdutoRepositoryPort pedidoProdutoRepositoryPort,
+            IPedidoRepositoryPort pedidoRepositoryPort,
+            IPagamentoRepositoryPort pagamentoRepositoryPort,
+            IFilaRepositoryPort filaRepositoryPort) {
+        return new PedidoUseCaseImpl(pedidoProdutoRepositoryPort, pedidoRepositoryPort, pagamentoRepositoryPort, filaRepositoryPort);
     }
 
     @Bean
-    public IPedidoProdutoUseCasePort pedidoProdutoUseCasePort(IPedidoUseCasePort pedidoUseCasePort,
+    public IPedidoProdutoUseCasePort pedidoProdutoUseCasePort(IPedidoRepositoryPort pedidoRepositoryPort,
                                                               IPedidoProdutoRepositoryPort pedidoProdutoRepositoryPort,
-                                                              IProdutoUseCasePort produtoUseCasePort) {
-        return new PedidoProdutoUseCaseImpl(pedidoProdutoRepositoryPort, pedidoUseCasePort, produtoUseCasePort);
+                                                              IProdutoRepositoryPort produtoRepositoryPort) {
+        return new PedidoProdutoUseCaseImpl(pedidoProdutoRepositoryPort, pedidoRepositoryPort, produtoRepositoryPort);
     }
 
     @Bean

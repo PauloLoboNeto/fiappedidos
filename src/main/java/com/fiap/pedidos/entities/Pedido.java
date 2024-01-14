@@ -19,9 +19,8 @@ public class Pedido {
 
     private UUID idPedido;
     private Cliente cliente;
-    private List<PedidoProduto> produtos;
+    private List<Produto> produtos;
     private StatusPedido statusPedido;
-    private StatusPagamento statusPagamento;
     private BigDecimal valorPedido;
     private Date dataInclusao;
     private Date dataAtualizacao;

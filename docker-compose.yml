@@ -3,7 +3,7 @@ version: '3.3'
 services:
   postgres:
     image: postgres
-    container_name: db
+    container_name: dbpedidos
     env_file: ./.env
     environment:
       - POSTGRES_PASSWORD=$POSTGRES_ROOT_PASSWORD
@@ -29,7 +29,12 @@ services:
         "spring.datasource.initialize" : true,
         "spring.datasource.continue-on-error": true,
         "spring.jpa.hibernate.ddl-auto":"update",
-        "server.port" : "$SPRING_LOCAL_PORT"
+        "server.port" : "$SPRING_LOCAL_PORT",
+        "server.servlet.context-path" : "/tech-challenge",
+        "fila.service.url" : "http://localhost:9092/tech-challenge/fila",
+        "pagamentos.service.url" : "http://localhost:9090/tech-challenge/pagamento",
+        "feign.client.config.default.connectTimeout" : 14000,
+        "feign.client.config.default.readTimeout" : 14000
       }'
     volumes:
       - .m2:/root/.m2
@@ -40,13 +45,13 @@ services:
 
   phppgadmin:
     image: dpage/pgadmin4
-    container_name: phppgadmin
+    container_name: phppgadminpedidos
     env_file: ./.env
     environment:
       - PGADMIN_DEFAULT_EMAIL=$PGADMIN_ROOT_EMAIL
       - PGADMIN_DEFAULT_PASSWORD=$PGADMIN_ROOT_PASSWORD
     ports:
-      - "8080:80"
+      - "8081:80"
     networks:
       - pedidos_default
 

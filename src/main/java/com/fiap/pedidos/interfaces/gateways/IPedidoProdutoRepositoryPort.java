@@ -11,6 +11,9 @@ import java.util.UUID;
 public interface IPedidoProdutoRepositoryPort {
 
     Optional<PedidoProduto> buscarPorId(UUID id);
+
+    List<Produto> obterTodosOsProdutosAssociadosAoPedidoPeloIdPedido(UUID id);
+
     PedidoProduto adicionarPedidoProduto(Pedido pedido, Produto produto, PedidoProduto pedidoProduto);
-    void excluirPedidoProduto(UUID idProduto);
+    void excluirPedidoProduto(UUID idPedido, UUID idProduto);
 }

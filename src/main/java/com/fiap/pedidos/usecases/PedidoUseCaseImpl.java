@@ -3,13 +3,16 @@ package com.fiap.pedidos.usecases;
 import com.fiap.pedidos.entities.Pedido;
 import com.fiap.pedidos.exceptions.entities.PedidoNaoEncontradoException;
 import com.fiap.pedidos.exceptions.entities.PedidoOperacaoNaoSuportadaException;
+import com.fiap.pedidos.interfaces.gateways.IFilaRepositoryPort;
 import com.fiap.pedidos.interfaces.gateways.IPagamentoRepositoryPort;
+import com.fiap.pedidos.interfaces.gateways.IPedidoProdutoRepositoryPort;
 import com.fiap.pedidos.interfaces.gateways.IPedidoRepositoryPort;
 import com.fiap.pedidos.interfaces.usecases.IPedidoUseCasePort;
 import com.fiap.pedidos.utils.enums.StatusPagamento;
 import com.fiap.pedidos.utils.enums.StatusPedido;
 import com.fiap.pedidos.utils.enums.TipoAtualizacao;
 import lombok.RequiredArgsConstructor;
+import org.springframework.scheduling.annotation.Async;
 
 import java.math.BigDecimal;
 import java.util.Comparator;
@@ -20,8 +23,10 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class PedidoUseCaseImpl implements IPedidoUseCasePort {
 
+    private final IPedidoProdutoRepositoryPort pedidoProdutoRepositoryPort;
     private final IPedidoRepositoryPort pedidoRepositoryPort;
     private final IPagamentoRepositoryPort pagamentoRepositoryPort;
+    private final IFilaRepositoryPort filaRepositoryPort;
 
     @Override
     public Pedido iniciarPedido(Pedido pedido) {
@@ -54,7 +59,6 @@ public class PedidoUseCaseImpl implements IPedidoUseCasePort {
                 if (pedidoExistente.getStatusPedido() != StatusPedido.A) {
                     throw new PedidoOperacaoNaoSuportadaException("Pedido não está aberto para edição.");
                 }
-                pedidoExistente.setStatusPagamento(StatusPagamento.PENDENTE);
             }
             case I -> {
                 if (pedidoExistente.getStatusPedido() != StatusPedido.A) {
@@ -68,26 +72,20 @@ public class PedidoUseCaseImpl implements IPedidoUseCasePort {
             case P -> this.atualizarStatusPagamento(pedidoExistente);
         }
 
-        return this.atualizarPedido(pedidoExistente);
+        Pedido pedido = this.atualizarPedido(pedidoExistente);
+
+        pedido.setProdutos(this.pedidoProdutoRepositoryPort
+                .obterTodosOsProdutosAssociadosAoPedidoPeloIdPedido(pedido.getIdPedido()));
+
+        return pedido;
     }
 
     private void atualizarStatusPagamento(Pedido pedido) {
-        StatusPagamento status = this.pagamentoRepositoryPort.consultaPagamento(pedido.getIdPedido());
+         var pagOk = this.pagamentoRepositoryPort.consultaPagamento(pedido.getIdPedido());
 
-        switch (status) {
-            case APROVADO -> {
-                pedido.setStatusPedido(StatusPedido.R);
-                pedido.setStatusPagamento(status);
-                //filaUseCasePort.inserirPedidoNaFila(pedido); TODO chamar api de fila
-            }
-            case RECUSADO -> {
-                pedido.setStatusPedido(StatusPedido.F);
-                pedido.setStatusPagamento(StatusPagamento.RECUSADO);
-            }
-            case PENDENTE -> {
-                pedido.setStatusPedido(StatusPedido.A);
-                pedido.setStatusPagamento(StatusPagamento.PENDENTE);
-            }
+        if(pagOk){
+            pedido.setStatusPedido(StatusPedido.R);
+            filaRepositoryPort.inserePedidoNaFila(pedido.getIdPedido(), pedido.getCliente().getId());
         }
     }
 

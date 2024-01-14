@@ -15,16 +15,11 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PedidoProdutoRequest {
-
-    @NotNull(message = "id pedido produto não pode estar vazio")
-    private UUID idPedidoProduto;
-
     private UUID idProduto;
 
     public PedidoProduto from(PedidoProdutoRequest request, UUID idPedido) {
         return PedidoProduto.builder()
                 .pedidoId(idPedido)
-                .id(request.getIdPedidoProduto())
                 .produtoId(request.getIdProduto())
                 .build();
     }

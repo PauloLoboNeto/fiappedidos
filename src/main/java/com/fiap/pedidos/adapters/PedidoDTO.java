@@ -22,26 +22,24 @@ import java.util.stream.Collectors;
 public class PedidoDTO {
     private UUID idPedido;
     private UUID idCliente;
-    private List<PedidoProdutoDTO> pedidoProdutos;
+    private List<ProdutoDTO> produtos;
     private StatusPedido statusPedido;
-    private StatusPagamento statusPagamento;
     private BigDecimal valorPedido;
     private Date dataInclusao;
     private Date dataAtualizacao;
 
     public static PedidoDTO from(Pedido pedido) {
-        List<PedidoProdutoDTO> pedidoProdutoDTO = null;
+        List<ProdutoDTO> pedidoProdutoDTO = null;
         if (Objects.nonNull(pedido.getProdutos())) {
             pedidoProdutoDTO = pedido.getProdutos().stream()
-                    .map(PedidoProdutoDTO::from)
+                    .map(ProdutoDTO::from)
                     .collect(Collectors.toList());
         }
         return PedidoDTO.builder()
                 .idPedido(pedido.getIdPedido())
                 .idCliente(pedido.getCliente().getId())
-                .pedidoProdutos(pedidoProdutoDTO)
+                .produtos(pedidoProdutoDTO)
                 .statusPedido(pedido.getStatusPedido())
-                .statusPagamento(pedido.getStatusPagamento())
                 .valorPedido(pedido.getValorPedido())
                 .dataInclusao(pedido.getDataInclusao())
                 .dataAtualizacao(pedido.getDataAtualizacao())

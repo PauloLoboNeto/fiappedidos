@@ -15,7 +15,7 @@ public class PedidoExceptionHandler {
     @ExceptionHandler(PedidoNaoEncontradoException.class)
     public ResponseEntity<StandardError> pedidoNaoEncontrado(PedidoNaoEncontradoException e, HttpServletRequest request){
         StandardError err = new StandardError(System.currentTimeMillis(), HttpStatus.NOT_FOUND.value(), "Pedido não encontrado", e.getMessage(), request.getRequestURI());
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(err);
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(err);
     }
 
     @ExceptionHandler(PedidoOperacaoNaoSuportadaException.class)
@@ -27,6 +27,6 @@ public class PedidoExceptionHandler {
     @ExceptionHandler(PedidoProdutoNaoEncontradoException.class)
     public ResponseEntity<StandardError> pedidoProdutoNaoEncontrado(PedidoProdutoNaoEncontradoException e, HttpServletRequest request){
         StandardError err = new StandardError(System.currentTimeMillis(), HttpStatus.NOT_FOUND.value(), "Produto não encontrado", e.getMessage(), request.getRequestURI());
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(err);
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(err);
     }
 }

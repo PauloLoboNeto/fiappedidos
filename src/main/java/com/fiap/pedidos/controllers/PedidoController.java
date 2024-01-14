@@ -16,12 +16,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 @RestController
@@ -33,7 +35,25 @@ public class PedidoController {
     private final IPedidoProdutoUseCasePort pedidoProdutoUseCasePort;
     private final IClienteUseCasePort clienteUseCasePort;
 
-    @PostMapping(value = "/",
+    @GetMapping(value = {"/", ""}, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<PedidoDTO>> buscarTodos(
+            @RequestParam(defaultValue = "0") int pageNumber,
+            @RequestParam(defaultValue = "100") int pageSize) {
+        List<Pedido> pedidos = pedidoUseCasePort.buscarTodos(pageNumber, pageSize);
+        List<PedidoDTO> pedidoDTOs = pedidos.stream()
+                .map(PedidoDTO::from)
+                .collect(Collectors.toList());
+        return new ResponseEntity<>(pedidoDTOs, HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/{idPedido}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<PedidoDTO> buscarPedido(
+            @PathVariable("idPedido") UUID idPedido) {
+        var pedidoDto = PedidoDTO.from(pedidoUseCasePort.buscarPorId(idPedido));
+        return new ResponseEntity<>(pedidoDto, HttpStatus.OK);
+    }
+
+    @PostMapping(value = {"/", ""},
             produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<PedidoDTO> iniciarPedido(@RequestBody @NotNull PedidoRequest request) {
@@ -50,20 +70,21 @@ public class PedidoController {
                 new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
-    @PostMapping(value = "/{id}",
+    @PostMapping(value = "/{idPedido}",
             produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<PedidoDTO> adicionarItem(
-            @PathVariable UUID idPedido, @RequestBody @NotNull PedidoProdutoRequest request) {
+            @PathVariable("idPedido") UUID idPedido, @RequestBody @NotNull PedidoProdutoRequest request) {
         PedidoProduto pedidoProduto = request.from(request, idPedido);
         Pedido pedido = pedidoProdutoUseCasePort.adicionarItemNoPedido(pedidoProduto);
         return new ResponseEntity<>(PedidoDTO.from(pedido), HttpStatus.OK);
     }
 
     //remover item do pedido
-    @DeleteMapping("/{id}")
+    @DeleteMapping(value = "/{idPedido}",
+            produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<PedidoDTO> removerItem(
-            @PathVariable UUID idPedido,
+            @PathVariable("idPedido") UUID idPedido,
             @RequestBody @NotNull PedidoProdutoRequest request) {
         PedidoProduto pedidoProduto = request.from(request, idPedido);
         pedidoProduto.setPedidoId(idPedido);
@@ -71,13 +92,20 @@ public class PedidoController {
         return new ResponseEntity<>(PedidoDTO.from(pedido), HttpStatus.OK);
     }
 
+    //FinalizaPedido
+    @PostMapping(value = "/checkout/{idPedido}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<PedidoDTO> checkout(@PathVariable UUID idPedido) {
+        return new ResponseEntity<>(PedidoDTO.from(pedidoUseCasePort
+                .atualizarPedido(idPedido, TipoAtualizacao.C, null, null)), HttpStatus.OK);
+    }
+
     //Utilizado pelo app de fila ao atualizar fila
     @PutMapping(
             value = "/{idPedido}/status/{status}",
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<PedidoDTO> atualizarStatusDoPedido(
-            @PathVariable UUID idPedido,
-            @PathVariable StatusPedido status) {
+            @PathVariable("idPedido") UUID idPedido,
+            @PathVariable("status") StatusPedido status) {
         PedidoDTO pedidoDTO = PedidoDTO.from(
                 pedidoUseCasePort.atualizarPedido(
                         idPedido,
@@ -88,37 +116,12 @@ public class PedidoController {
         return ResponseEntity.ok().body(pedidoDTO);
     }
 
-    //FinalizaPedido
-    @PostMapping("/checkout/{idPedido}")
-    public ResponseEntity<PedidoDTO> checkout(@PathVariable UUID idPedido) {
-        return new ResponseEntity<>(PedidoDTO.from(pedidoUseCasePort
-                .atualizarPedido(idPedido, TipoAtualizacao.C, null, null)), HttpStatus.OK);
-    }
-
     //Utilizado pelo app de pagamentos ao atualizar status do pagamento
-    @PutMapping("/{idPedido}/webhook")
-    public ResponseEntity<PedidoDTO> atualizarStatusDoPagamentoDoPedido(
+    @PutMapping(value = "/{idPedido}/webhook", produces = MediaType.APPLICATION_JSON_VALUE)
+    public CompletableFuture<ResponseEntity<String>> atualizarStatusDoPagamentoDoPedido(
             @PathVariable UUID idPedido) {
         PedidoDTO pedidoDTO = PedidoDTO.from(pedidoUseCasePort
                 .atualizarPedido(idPedido,TipoAtualizacao.P, null, null));
-        return ResponseEntity.ok().body(pedidoDTO);
-    }
-
-    @GetMapping("/")
-    public ResponseEntity<List<PedidoDTO>> buscarTodos(
-            @RequestParam(defaultValue = "0") int pageNumber,
-            @RequestParam(defaultValue = "100") int pageSize) {
-        List<Pedido> pedidos = pedidoUseCasePort.buscarTodos(pageNumber, pageSize);
-        List<PedidoDTO> pedidoDTOs = pedidos.stream()
-                .map(PedidoDTO::from)
-                .collect(Collectors.toList());
-        return new ResponseEntity<>(pedidoDTOs, HttpStatus.OK);
-    }
-
-    @GetMapping("/{id}")
-    public ResponseEntity<PedidoDTO> buscarPedido(
-            @PathVariable UUID idPedido) {
-        var pedidoDto = PedidoDTO.from(pedidoUseCasePort.buscarPorId(idPedido));
-        return new ResponseEntity<>(pedidoDto, HttpStatus.OK);
+        return CompletableFuture.completedFuture(new ResponseEntity<String>("Requisição recebida e processamento iniciado.", HttpStatus.OK));
     }
 }

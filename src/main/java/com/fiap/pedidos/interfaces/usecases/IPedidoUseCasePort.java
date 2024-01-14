@@ -18,4 +18,5 @@ public interface IPedidoUseCasePort {
     Pedido atualizarPedido(UUID idPedido, TipoAtualizacao tipoAtualizacao, Pedido pedido, StatusPedido statusPedido);
 
     Pedido atualizarPedido(Pedido pedido);
+
 }

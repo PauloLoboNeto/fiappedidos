@@ -11,13 +11,17 @@ import com.fiap.pedidos.gateways.entities.ProdutoEntity;
 import com.fiap.pedidos.interfaces.gateways.IPedidoProdutoRepositoryPort;
 import com.fiap.pedidos.interfaces.repositories.PedidoProdutoRepository;
 import com.fiap.pedidos.interfaces.repositories.PedidoRepository;
+import com.fiap.pedidos.interfaces.repositories.ProdutoRepository;
 import com.fiap.pedidos.utils.enums.StatusPedido;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -25,6 +29,7 @@ public class PedidoProdutoRepositoryAdapter implements IPedidoProdutoRepositoryP
 
     private final PedidoProdutoRepository pedidoProdutoRepository;
     private final PedidoRepository pedidoRepository;
+    private final ProdutoRepository produtoRepository;
 
     @Override
     @Transactional(readOnly = true)
@@ -41,7 +46,6 @@ public class PedidoProdutoRepositoryAdapter implements IPedidoProdutoRepositoryP
         PedidoEntity pedidoEntity = new PedidoEntity().from(pedido, false);
 
         PedidoProdutoEntity pedidoProdutoEntity = PedidoProdutoEntity.builder()
-                .id(pedidoProduto.getId())
                 .pedido(pedidoEntity)
                 .produto(existProdutoEntity)
                 .build();
@@ -51,22 +55,30 @@ public class PedidoProdutoRepositoryAdapter implements IPedidoProdutoRepositoryP
 
     @Override
     @Transactional
-    public void excluirPedidoProduto(UUID id) {
-        Optional<PedidoProdutoEntity> pedidoProdutoOptional = pedidoProdutoRepository.findById(id);
+    public void excluirPedidoProduto(UUID idPedido, UUID idProduto) {
+        Optional<PedidoEntity> pedidoEntityOptional = pedidoRepository.findById(idPedido);
 
-        if (pedidoProdutoOptional.isPresent()) {
-            Optional<PedidoEntity> pedidoOptional = pedidoRepository
-                    .findById(pedidoProdutoOptional.get().getPedido().getIdPedido());
-
-            if(pedidoOptional.isEmpty()){
-                throw new PedidoNaoEncontradoException();
-            }
-
-            if(pedidoOptional.get().getStatusPedido() == StatusPedido.A) {
-                throw new PedidoOperacaoNaoSuportadaException("Pedido status is not A, id: " + pedidoOptional.get().getIdPedido());
-            }
-
-            pedidoProdutoRepository.deleteById(id);
+        if(pedidoEntityOptional.isEmpty()){
+            throw new PedidoNaoEncontradoException();
         }
+
+        if(pedidoEntityOptional.get().getStatusPedido() != StatusPedido.A) {
+            throw new PedidoOperacaoNaoSuportadaException("Pedido status is not A, id: " + pedidoEntityOptional.get().getIdPedido());
+        }
+
+        pedidoProdutoRepository.deleteByIdPedidoAndIdProduto(idPedido, idProduto);
+    }
+
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Produto> obterTodosOsProdutosAssociadosAoPedidoPeloIdPedido(UUID idPedido) {
+        var produtoEntityList = produtoRepository.findAllProductsByIdPedido(idPedido);
+
+        return produtoEntityList.map(produtoEntities -> produtoEntities
+                .stream()
+                .map(ProdutoEntity::to)
+                .collect(Collectors.toList())).orElseGet(ArrayList::new);
+
     }
 }

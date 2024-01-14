@@ -34,17 +34,8 @@ public class PedidoProdutoEntity {
 
     public static PedidoProduto to(PedidoProdutoEntity pedidoProdutoEntity) {
         return PedidoProduto.builder()
-                .id(pedidoProdutoEntity.getId())
                 .pedidoId(pedidoProdutoEntity.getPedido().getIdPedido())
                 .produtoId(pedidoProdutoEntity.getProduto().getIdProduto())
-                .build();
-    }
-
-    public static PedidoProdutoEntity from(PedidoProduto pedidoProduto, PedidoEntity pedidoEntity, ProdutoEntity produtoEntity) {
-        return PedidoProdutoEntity.builder()
-                .id(pedidoProduto.getId())
-                .pedido(pedidoEntity)
-                .produto(produtoEntity)
                 .build();
     }
 }
