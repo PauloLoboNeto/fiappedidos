@@ -2,8 +2,9 @@ package com.fiap.pedidos.utils.enums;
 
 public enum StatusPedido {
     A("Aberto"),
-    R("Pagamento Recebido"),
+    R("Recebido"),
     E("Em preparação"),
+    P("Pronto"),
     F("Finalizado");
 
     private final String descricao;
