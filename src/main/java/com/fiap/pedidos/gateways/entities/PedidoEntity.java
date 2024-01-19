@@ -3,7 +3,6 @@ package com.fiap.pedidos.gateways.entities;
 
 import com.fiap.pedidos.entities.Pedido;
 import com.fiap.pedidos.entities.PedidoProduto;
-import com.fiap.pedidos.utils.enums.StatusPagamento;
 import com.fiap.pedidos.utils.enums.StatusPedido;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;

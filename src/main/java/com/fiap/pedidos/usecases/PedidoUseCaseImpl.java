@@ -8,11 +8,9 @@ import com.fiap.pedidos.interfaces.gateways.IPagamentoRepositoryPort;
 import com.fiap.pedidos.interfaces.gateways.IPedidoProdutoRepositoryPort;
 import com.fiap.pedidos.interfaces.gateways.IPedidoRepositoryPort;
 import com.fiap.pedidos.interfaces.usecases.IPedidoUseCasePort;
-import com.fiap.pedidos.utils.enums.StatusPagamento;
 import com.fiap.pedidos.utils.enums.StatusPedido;
 import com.fiap.pedidos.utils.enums.TipoAtualizacao;
 import lombok.RequiredArgsConstructor;
-import org.springframework.scheduling.annotation.Async;
 
 import java.math.BigDecimal;
 import java.util.Comparator;

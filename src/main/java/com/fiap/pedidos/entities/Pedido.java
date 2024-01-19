@@ -1,6 +1,5 @@
 package com.fiap.pedidos.entities;
 
-import com.fiap.pedidos.utils.enums.StatusPagamento;
 import com.fiap.pedidos.utils.enums.StatusPedido;
 import lombok.*;
 

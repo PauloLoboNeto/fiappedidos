@@ -2,11 +2,9 @@ package com.fiap.pedidos.gateways;
 
 import com.fiap.pedidos.interfaces.gateways.IPagamentoRepositoryPort;
 import com.fiap.pedidos.interfaces.repositories.PagamentoRepository;
-import com.fiap.pedidos.utils.enums.StatusPagamento;
 import feign.Response;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;

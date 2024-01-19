@@ -17,7 +17,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,7 +24,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 @RestController
@@ -38,24 +36,6 @@ public class PedidoController {
     private final IPedidoProdutoUseCasePort pedidoProdutoUseCasePort;
     private final IClienteUseCasePort clienteUseCasePort;
     private final IServiceAsyncProcessWebhook serviceAsyncProcessWebhook;
-
-    @GetMapping(value = {"/", ""}, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<PedidoDTO>> buscarTodosNaoFinalizados(
-            @RequestParam(defaultValue = "0") int pageNumber,
-            @RequestParam(defaultValue = "100") int pageSize) {
-        List<Pedido> pedidos = pedidoUseCasePort.buscarTodos(pageNumber, pageSize);
-        List<PedidoDTO> pedidoDTOs = pedidos.stream()
-                .map(PedidoDTO::from)
-                .collect(Collectors.toList());
-        return new ResponseEntity<>(pedidoDTOs, HttpStatus.OK);
-    }
-
-    @GetMapping(value = "/{idPedido}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<PedidoDTO> buscarPedido(
-            @PathVariable("idPedido") UUID idPedido) {
-        var pedidoDto = PedidoDTO.from(pedidoUseCasePort.buscarPorId(idPedido));
-        return new ResponseEntity<>(pedidoDto, HttpStatus.OK);
-    }
 
     @PostMapping(value = {"/", ""},
             produces = MediaType.APPLICATION_JSON_VALUE,
@@ -101,6 +81,24 @@ public class PedidoController {
     public ResponseEntity<PedidoDTO> checkout(@PathVariable UUID idPedido) {
         return new ResponseEntity<>(PedidoDTO.from(pedidoUseCasePort
                 .atualizarPedido(idPedido, TipoAtualizacao.C, null, null)), HttpStatus.OK);
+    }
+
+    @GetMapping(value = {"/", ""}, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<PedidoDTO>> buscarTodosNaoFinalizados(
+            @RequestParam(defaultValue = "0") int pageNumber,
+            @RequestParam(defaultValue = "100") int pageSize) {
+        List<Pedido> pedidos = pedidoUseCasePort.buscarTodos(pageNumber, pageSize);
+        List<PedidoDTO> pedidoDTOs = pedidos.stream()
+                .map(PedidoDTO::from)
+                .collect(Collectors.toList());
+        return new ResponseEntity<>(pedidoDTOs, HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/{idPedido}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<PedidoDTO> buscarPedido(
+            @PathVariable("idPedido") UUID idPedido) {
+        var pedidoDto = PedidoDTO.from(pedidoUseCasePort.buscarPorId(idPedido));
+        return new ResponseEntity<>(pedidoDto, HttpStatus.OK);
     }
 
     //Utilizado pelo app de fila ao atualizar fila

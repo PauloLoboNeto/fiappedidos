@@ -28,7 +28,7 @@ public class ClienteUseCaseImpl implements IClienteUseCasePort {
     public Cliente identificarPorCpf(Cpf cpf) {
         Optional<Cliente> clienteDb = buscarPorCpf(cpf);
         return clienteDb
-                .orElseGet(() -> clienteRepositoryPort.identificarPorCpf(Cliente.builder().cpf(cpf).build()));
+                .orElseGet(() -> clienteRepositoryPort.cadastrar(Cliente.builder().cpf(cpf).build()));
     }
 
     @Override

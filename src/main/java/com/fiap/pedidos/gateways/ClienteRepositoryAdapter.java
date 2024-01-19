@@ -22,13 +22,8 @@ public class ClienteRepositoryAdapter implements IClienteRepositoryPort {
     @Override
     public Cliente cadastrar(Cliente cliente) {
         ClienteEntity clienteEntity = new ClienteEntity().from(cliente);
-        return clienteRepository.save(clienteEntity).to(clienteEntity);
-    }
-
-    @Override
-    public Cliente identificarPorCpf(Cliente cliente) {
-        ClienteEntity clienteEntity = new ClienteEntity().from(cliente);
-        return clienteRepository.save(clienteEntity).to(clienteEntity);
+        var clienteSalvo = clienteRepository.save(clienteEntity);
+        return clienteSalvo.to(clienteSalvo);
     }
 
     @Override
@@ -43,9 +38,11 @@ public class ClienteRepositoryAdapter implements IClienteRepositoryPort {
 
     @Override
     public List<Cliente> bucarTodos() {
-        List<ClienteEntity> test = clienteRepository.findAll();
-        List<Cliente> test2 = test.stream().map(e -> e.to(e)).collect(Collectors.toList());
-        return test2;
+        List<ClienteEntity> clientesEntity = clienteRepository.findAll();
+        return clientesEntity
+                .stream()
+                .map(clienteEntity -> clienteEntity.to(clienteEntity))
+                .collect(Collectors.toList());
     }
 
     @Override

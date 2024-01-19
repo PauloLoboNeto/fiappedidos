@@ -2,7 +2,6 @@ package com.fiap.pedidos.adapters;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fiap.pedidos.entities.Pedido;
-import com.fiap.pedidos.utils.enums.StatusPagamento;
 import com.fiap.pedidos.utils.enums.StatusPedido;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
