@@ -1,10 +1,9 @@
-package com.fiap.pedidos;
+package com.fiap.pedidos.gateways;
 
 import com.fiap.pedidos.entities.Cliente;
 import com.fiap.pedidos.entities.Cpf;
 import com.fiap.pedidos.entities.Email;
 import com.fiap.pedidos.entities.Nome;
-import com.fiap.pedidos.gateways.ClienteRepositoryAdapter;
 import com.fiap.pedidos.gateways.entities.ClienteEntity;
 import com.fiap.pedidos.interfaces.gateways.IClienteRepositoryPort;
 import com.fiap.pedidos.interfaces.repositories.ClienteRepository;
@@ -158,13 +157,6 @@ class ClienteRepositoryAdapterTest {
 
             verify(clienteRepository, times(1)).findAll();
         }
-
-//        @Test
-//        @Severity(SeverityLevel.CRITICAL)
-//        @Description("Atualizar pagamento")
-//        void buscarClientePorID(){
-//
-//        }
     }
 
     private static Cliente gerarClienteComTodosDados() {

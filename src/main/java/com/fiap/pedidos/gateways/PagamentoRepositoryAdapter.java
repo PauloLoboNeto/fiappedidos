@@ -18,9 +18,4 @@ public class PagamentoRepositoryAdapter implements IPagamentoRepositoryPort {
     public boolean consultaPagamento(UUID idPedido) {Response response = this.pagamentoRepository.consultarPagamento(idPedido);
        return response.status() == HttpStatus.OK.value();
     }
-//
-//    @Override
-//    public StatusPagamento consultaPagamento(UUID idPedido) {
-//        return StatusPagamento.APROVADO;
-//    }
 }
