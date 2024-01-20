@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -45,9 +46,10 @@ public class PedidoRepositoryAdapter implements IPedidoRepositoryPort {
         PedidoEntity pedidoEntity = this.pedidoRepository.findById(idPedido)
                 .orElseThrow(() -> new PedidoNaoEncontradoException("Pedido not found, id: " + idPedido));
 
-        pedidoEntity.getProdutos().forEach(pedidoProdutoEntity -> {
-            this.pedidoProdutoRepository.deleteById(pedidoProdutoEntity.getId());
-        });
+        if(Objects.nonNull(pedidoEntity.getProdutos()) && !pedidoEntity.getProdutos().isEmpty())
+            pedidoEntity.getProdutos().forEach(pedidoProdutoEntity -> {
+                this.pedidoProdutoRepository.deleteById(pedidoProdutoEntity.getId());
+            });
         this.pedidoRepository.delete(pedidoEntity);
     }
 

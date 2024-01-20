@@ -2,9 +2,8 @@ package com.fiap.pedidos.gateways;
 
 import com.fiap.pedidos.entities.Cliente;
 import com.fiap.pedidos.entities.Cpf;
-import com.fiap.pedidos.entities.Email;
-import com.fiap.pedidos.entities.Nome;
 import com.fiap.pedidos.gateways.entities.ClienteEntity;
+import com.fiap.pedidos.helpers.Helper;
 import com.fiap.pedidos.interfaces.gateways.IClienteRepositoryPort;
 import com.fiap.pedidos.interfaces.repositories.ClienteRepository;
 import io.qameta.allure.Description;
@@ -46,12 +45,11 @@ class ClienteRepositoryAdapterTest {
     }
 
     @Nested class CadastrarCliente{
-
         @Test
         @Severity(SeverityLevel.BLOCKER)
         @Description("Cadastrar cliente com nome, cpf e email")
         void deveCadastrarClienteUtilizandoNomeCPFeEmail(){
-            var cliente = gerarClienteComTodosDados();
+            var cliente = Helper.gerarClienteComTodosDados();
             var clienteEntity = new ClienteEntity().from(cliente);
             clienteEntity.setId(UUID.randomUUID());
 
@@ -73,7 +71,7 @@ class ClienteRepositoryAdapterTest {
         @Severity(SeverityLevel.BLOCKER)
         @Description("Cadastrar cliente somente com cpf")
         void deveCadastrarClienteUtilizandoSomenteCPF(){
-            var cliente = gerarClienteSomenteComCPF();
+            var cliente = Helper.gerarClienteSomenteComCPF();
             var clienteEntity = new ClienteEntity().from(cliente);
             clienteEntity.setId(UUID.randomUUID());
 
@@ -115,7 +113,7 @@ class ClienteRepositoryAdapterTest {
         @Description("Buscar cliente pelo cpf")
         void deveBuscarClientePorCpf(){
             var cpf = "11111111111";
-            var clienteEntity = new ClienteEntity().from(gerarClienteComTodosDados());
+            var clienteEntity = new ClienteEntity().from(Helper.gerarClienteComTodosDados());
             clienteEntity.setId(UUID.randomUUID());
 
             when(clienteRepository.findAllByCpf(any(Cpf.class))).thenReturn(Optional.of(clienteEntity));
@@ -132,8 +130,8 @@ class ClienteRepositoryAdapterTest {
         @Severity(SeverityLevel.CRITICAL)
         @Description("Buscar todos os clientes")
         void deveBuscarTodosOsCliente(){
-            var clienteComTodosDados = gerarClienteComTodosDados();
-            var clienteSomenteComCpf = gerarClienteSomenteComCPF();
+            var clienteComTodosDados = Helper.gerarClienteComTodosDados();
+            var clienteSomenteComCpf = Helper.gerarClienteSomenteComCPF();
             var clienteEntityList = new ArrayList<ClienteEntity>();
 
             clienteEntityList.add(new ClienteEntity().from(clienteComTodosDados));
@@ -157,19 +155,5 @@ class ClienteRepositoryAdapterTest {
 
             verify(clienteRepository, times(1)).findAll();
         }
-    }
-
-    private static Cliente gerarClienteComTodosDados() {
-        return Cliente.builder()
-                .email(new Email("cliente1@gmail.com"))
-                .nome(new Nome("Cliente 1"))
-                .cpf(new Cpf("11111111111"))
-                .build();
-    }
-
-    private static Cliente gerarClienteSomenteComCPF() {
-        return Cliente.builder()
-                .cpf(new Cpf("11111111111"))
-                .build();
     }
 }

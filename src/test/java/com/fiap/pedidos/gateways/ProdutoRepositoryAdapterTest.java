@@ -1,10 +1,8 @@
 package com.fiap.pedidos.gateways;
 
-import com.fiap.pedidos.entities.DescricaoProduto;
-import com.fiap.pedidos.entities.NomeProduto;
 import com.fiap.pedidos.entities.Produto;
-import com.fiap.pedidos.entities.ValorProduto;
 import com.fiap.pedidos.gateways.entities.ProdutoEntity;
+import com.fiap.pedidos.helpers.Helper;
 import com.fiap.pedidos.interfaces.gateways.IProdutoRepositoryPort;
 import com.fiap.pedidos.interfaces.repositories.ProdutoRepository;
 import com.fiap.pedidos.utils.enums.TipoProduto;
@@ -18,7 +16,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Optional;
 import java.util.UUID;
@@ -54,7 +51,7 @@ class ProdutoRepositoryAdapterTest {
         @Severity(SeverityLevel.BLOCKER)
         @Description("Cadastrar bebida")
         void deveCadastrarProdutoBebida() {
-            var produto = gerarProdutoBebida();
+            var produto = Helper.gerarProdutoBebida();
             var produtoEntity = new ProdutoEntity().from(produto, true);
             produtoEntity.setIdProduto(UUID.randomUUID());
 
@@ -77,7 +74,7 @@ class ProdutoRepositoryAdapterTest {
         @Severity(SeverityLevel.BLOCKER)
         @Description("Cadastrar Acompanhamento")
         void deveCadastrarProdutoAcompanhamento() {
-            var produto = gerarProdutoAcompanhamento();
+            var produto = Helper.gerarProdutoAcompanhamento();
             var produtoEntity = new ProdutoEntity().from(produto, true);
             produtoEntity.setIdProduto(UUID.randomUUID());
 
@@ -100,7 +97,7 @@ class ProdutoRepositoryAdapterTest {
         @Severity(SeverityLevel.BLOCKER)
         @Description("Cadastrar Lanche")
         void deveCadastrarProdutoLanche() {
-            var produto = gerarProdutoLanche();
+            var produto = Helper.gerarProdutoLanche();
             var produtoEntity = new ProdutoEntity().from(produto, true);
             produtoEntity.setIdProduto(UUID.randomUUID());
 
@@ -123,7 +120,7 @@ class ProdutoRepositoryAdapterTest {
         @Severity(SeverityLevel.BLOCKER)
         @Description("Cadastrar Sobremesa")
         void deveCadastrarProdutoSobremesa() {
-            var produto = gerarProdutoSobremesa();
+            var produto = Helper.gerarProdutoSobremesa();
             var produtoEntity = new ProdutoEntity().from(produto, true);
             produtoEntity.setIdProduto(UUID.randomUUID());
 
@@ -150,7 +147,7 @@ class ProdutoRepositoryAdapterTest {
         @Severity(SeverityLevel.BLOCKER)
         @Description("Remover produto")
         void deveRemoverProduto() {
-            var produto = gerarProdutoSobremesa();
+            var produto = Helper.gerarProdutoSobremesa();
             var produtoEntity = new ProdutoEntity().from(produto, true);
             var idRandom = UUID.randomUUID();
             produtoEntity.setIdProduto(idRandom);
@@ -160,8 +157,6 @@ class ProdutoRepositoryAdapterTest {
 
             produtoRepositoryPort.deletarProduto(idRandom);
 
-            verify(produtoRepository).findById(any(UUID.class));
-            verify(produtoRepository).save(any(ProdutoEntity.class));
             verify(produtoRepository, times(1)).save(any(ProdutoEntity.class));
             verify(produtoRepository, times(1)).findById(any(UUID.class));
         }
@@ -174,7 +169,7 @@ class ProdutoRepositoryAdapterTest {
         @Severity(SeverityLevel.BLOCKER)
         @Description("Buscar Produto por idproduto")
         void deveBuscarProdutoPorIDProduto() {
-            var produto = gerarProdutoSobremesa();
+            var produto = Helper.gerarProdutoSobremesa();
             var produtoEntity = new ProdutoEntity().from(produto, true);
             var idRandom = UUID.randomUUID();
             produtoEntity.setIdProduto(idRandom);
@@ -192,7 +187,6 @@ class ProdutoRepositoryAdapterTest {
             assertThat(produtoBuscado.get().getValorProduto().getValorProduto()).isEqualTo(produto.getValorProduto().getValorProduto());
             assertThat(produtoBuscado.get().getDescricaoProduto().getDescricao()).isEqualTo(produto.getDescricaoProduto().getDescricao());
 
-            verify(produtoRepository).findById(any(UUID.class));
             verify(produtoRepository, times(1)).findById(any(UUID.class));
         }
 
@@ -200,7 +194,7 @@ class ProdutoRepositoryAdapterTest {
         @Severity(SeverityLevel.CRITICAL)
         @Description("Buscar Produto sobremesa")
         void deveBuscarProdutoPorTipoProdutoSobremesa() {
-            var produtoSobremesa = gerarProdutoSobremesa();
+            var produtoSobremesa = Helper.gerarProdutoSobremesa();
 
             var produtoEntityList = new ArrayList<ProdutoEntity>();
             produtoEntityList.add( new ProdutoEntity().from(produtoSobremesa, true));
@@ -223,7 +217,6 @@ class ProdutoRepositoryAdapterTest {
             assertThat(produtoBuscado.get(0).getValorProduto().getValorProduto()).isEqualTo(produtoSobremesa.getValorProduto().getValorProduto());
             assertThat(produtoBuscado.get(0).getDescricaoProduto().getDescricao()).isEqualTo(produtoSobremesa.getDescricaoProduto().getDescricao());
 
-            verify(produtoRepository).findAllByTipoProdutoAndAtivo(any(String.class), any(Boolean.class));
             verify(produtoRepository, times(1)).findAllByTipoProdutoAndAtivo(any(String.class), any(Boolean.class));
         }
 
@@ -231,7 +224,7 @@ class ProdutoRepositoryAdapterTest {
         @Severity(SeverityLevel.CRITICAL)
         @Description("Buscar Produto Lanche")
         void deveBuscarProdutoPorTipoProdutoLanche() {
-            var produtoLanche = gerarProdutoLanche();
+            var produtoLanche = Helper.gerarProdutoLanche();
 
             var produtoEntityList = new ArrayList<ProdutoEntity>();
             produtoEntityList.add( new ProdutoEntity().from(produtoLanche, true));
@@ -253,7 +246,6 @@ class ProdutoRepositoryAdapterTest {
             assertThat(produtoBuscado.get(0).getValorProduto().getValorProduto()).isEqualTo(produtoLanche.getValorProduto().getValorProduto());
             assertThat(produtoBuscado.get(0).getDescricaoProduto().getDescricao()).isEqualTo(produtoLanche.getDescricaoProduto().getDescricao());
 
-            verify(produtoRepository).findAllByTipoProdutoAndAtivo(any(String.class), any(Boolean.class));
             verify(produtoRepository, times(1)).findAllByTipoProdutoAndAtivo(any(String.class), any(Boolean.class));
         }
 
@@ -261,7 +253,7 @@ class ProdutoRepositoryAdapterTest {
         @Severity(SeverityLevel.CRITICAL)
         @Description("Buscar Produto Bebida")
         void deveBuscarProdutoPorTipoProdutoBebida() {
-            var produtoBebida = gerarProdutoBebida();
+            var produtoBebida = Helper.gerarProdutoBebida();
 
             var produtoEntityList = new ArrayList<ProdutoEntity>();
             produtoEntityList.add( new ProdutoEntity().from(produtoBebida, true));
@@ -281,7 +273,6 @@ class ProdutoRepositoryAdapterTest {
             assertThat(produtoBuscado.get(0).getValorProduto().getValorProduto()).isEqualTo(produtoBebida.getValorProduto().getValorProduto());
             assertThat(produtoBuscado.get(0).getDescricaoProduto().getDescricao()).isEqualTo(produtoBebida.getDescricaoProduto().getDescricao());
 
-            verify(produtoRepository).findAllByTipoProdutoAndAtivo(any(String.class), any(Boolean.class));
             verify(produtoRepository, times(1)).findAllByTipoProdutoAndAtivo(any(String.class), any(Boolean.class));
         }
 
@@ -289,7 +280,7 @@ class ProdutoRepositoryAdapterTest {
         @Severity(SeverityLevel.CRITICAL)
         @Description("Buscar Produto Acompanhamento")
         void deveBuscarProdutoPorTipoProdutoAcomponhamento() {
-            var produtoAcompanhamento = gerarProdutoAcompanhamento();
+            var produtoAcompanhamento = Helper.gerarProdutoAcompanhamento();
 
             var produtoEntityList = new ArrayList<ProdutoEntity>();
             produtoEntityList.add( new ProdutoEntity().from(produtoAcompanhamento, true));
@@ -308,53 +299,8 @@ class ProdutoRepositoryAdapterTest {
             assertThat(produtoBuscado.get(0).getIdProduto()).isNotNull();
             assertThat(produtoBuscado.get(0).getTipoProduto().getCodigo()).isEqualTo(TipoProduto.ACOMPANHAMENTO.getCodigo());
 
-            verify(produtoRepository).findAllByTipoProdutoAndAtivo(any(String.class), any(Boolean.class));
             verify(produtoRepository, times(1)).findAllByTipoProdutoAndAtivo(any(String.class), any(Boolean.class));
         }
-
-
-        //public List<Produto> listarProdutosPorTipo(TipoProduto tipoProduto) {
-//    final var produtoList = new ArrayList<Produto>();
-//    final Optional<List<ProdutoEntity>> produtoEntityList = this.produtoRepository
-//            .findAllByTipoProdutoAndAtivo(tipoProduto.getCodigo(), true);
-//
-//    produtoEntityList.ifPresent(
-//            produtoEntities ->
-//                    produtoEntities.forEach(
-//                            produtoEntity -> produtoList.add(produtoEntity.to())
-//                    )
-//    );
-//
-//    return produtoList;
-    }
-
-
-    private static Produto gerarProdutoBebida() {
-        return Produto.builder().nomeProduto(new NomeProduto(TipoProduto.BEBIDA.name()))
-                .descricaoProduto(new DescricaoProduto("Descricao produto: "))
-                .tipoProduto(TipoProduto.BEBIDA)
-                .valorProduto(new ValorProduto(new BigDecimal(5.0))).build();
-    }
-
-    private static Produto gerarProdutoAcompanhamento() {
-        return Produto.builder().nomeProduto(new NomeProduto(TipoProduto.ACOMPANHAMENTO.name()))
-                .descricaoProduto(new DescricaoProduto("Descricao produto: "))
-                .tipoProduto(TipoProduto.ACOMPANHAMENTO)
-                .valorProduto(new ValorProduto(new BigDecimal(5.0))).build();
-    }
-
-    private static Produto gerarProdutoLanche() {
-        return Produto.builder().nomeProduto(new NomeProduto(TipoProduto.LANCHE.name()))
-                .descricaoProduto(new DescricaoProduto("Descricao produto: "))
-                .tipoProduto(TipoProduto.LANCHE)
-                .valorProduto(new ValorProduto(new BigDecimal(5.0))).build();
-    }
-
-    private static Produto gerarProdutoSobremesa() {
-        return Produto.builder().nomeProduto(new NomeProduto(TipoProduto.SOBREMESA.name()))
-                .descricaoProduto(new DescricaoProduto("Descricao produto: "))
-                .tipoProduto(TipoProduto.SOBREMESA)
-                .valorProduto(new ValorProduto(new BigDecimal(5.0))).build();
     }
 }
 

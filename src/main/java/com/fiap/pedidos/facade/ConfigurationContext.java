@@ -15,11 +15,6 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class ConfigurationContext {
 
-//    @Bean
-//    public IPagamentoRepositoryPort pagamentoRepositoryPort(PagamentoRepository pagamentoRepository) {
-//        return new PagamentoRepositoryAdapter(pagamentoRepository);
-//    }
-
     @Bean
     public IProdutoUseCasePort produtoUseCasePort(IProdutoRepositoryPort produtoRepositoryPort) {
         return new ProdutoUseCaseImpl(produtoRepositoryPort);
