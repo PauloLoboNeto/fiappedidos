@@ -1,8 +1,11 @@
 package com.fiap.pedidos.gateways;
 
 import com.fiap.pedidos.entities.PedidoProduto;
+import com.fiap.pedidos.entities.Produto;
+import com.fiap.pedidos.exceptions.entities.PedidoNaoEncontradoException;
 import com.fiap.pedidos.gateways.entities.PedidoEntity;
 import com.fiap.pedidos.gateways.entities.PedidoProdutoEntity;
+import com.fiap.pedidos.gateways.entities.ProdutoEntity;
 import com.fiap.pedidos.helpers.Helper;
 import com.fiap.pedidos.interfaces.gateways.IPedidoProdutoRepositoryPort;
 import com.fiap.pedidos.interfaces.repositories.PedidoProdutoRepository;
@@ -17,12 +20,16 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -90,6 +97,7 @@ class PedidoProdutoRepositoryAdapterTest {
 
             verify(pedidoProdutoRepository, times(1)).save(any(PedidoProdutoEntity.class));
         }
+
     }
 
     @Nested
@@ -99,8 +107,6 @@ class PedidoProdutoRepositoryAdapterTest {
         @Severity(SeverityLevel.CRITICAL)
         @Description("Buscar PedidoProduto")
         void deveBuscarPedidoProduto() {
-            var pedido = Helper.gerarPedidoComCliente();
-            var produto = Helper.gerarProdutoLanche();
             var pedidoProdutoEntity = Helper.gerarPedidoProdutoEntity();
             var uuid = UUID.randomUUID();
             pedidoProdutoEntity.setId(uuid);
@@ -118,6 +124,32 @@ class PedidoProdutoRepositoryAdapterTest {
             verify(pedidoProdutoRepository, times(1)).findById(any(UUID.class));
         }
 
+        @Test
+        @Severity(SeverityLevel.CRITICAL)
+        @Description("Buscar todos os produtos associados ao pedido")
+        void deveObterTodosOsProdutosAssociadosAoPedidoPeloIdPedido() {
+            var uuid = UUID.randomUUID();
+
+            var produtoEntity = Helper.gerarProdutoEntity();
+
+            when(produtoRepository
+                    .findAllProductsByIdPedido(any(UUID.class)))
+                    .thenReturn(Optional.of(List.of(produtoEntity)));
+
+            var pedidoProdutoSalvo = pedidoProdutoRepositoryPort
+                    .obterTodosOsProdutosAssociadosAoPedidoPeloIdPedido(uuid);
+
+            assertThat(pedidoProdutoSalvo.isEmpty()).isFalse();
+            assertThat(pedidoProdutoSalvo.get(0)).isInstanceOf(Produto.class);
+
+            assertThat(pedidoProdutoSalvo.get(0).getIdProduto()).isEqualTo(produtoEntity.getIdProduto());
+
+            verify(produtoRepository, times(1))
+                    .findAllProductsByIdPedido(any(UUID.class));
+        }
+    }
+    @Nested
+    class RemoverPedidoProduto {
         @Test
         @Severity(SeverityLevel.CRITICAL)
         @Description("Remover PedidoProduto")
@@ -149,6 +181,22 @@ class PedidoProdutoRepositoryAdapterTest {
 
             verify(pedidoProdutoRepository, times(1))
                     .deleteByIdPedidoAndIdProduto(any(UUID.class), any(UUID.class));
+
+            verify(pedidoRepository, times(1)).findById(any(UUID.class));
+        }
+
+        @Test
+        @Severity(SeverityLevel.CRITICAL)
+        @Description("Remover PedidoProduto quando não existe pedido")
+        void deveFalhar_AoTentarRemoverPedidoProduto() {
+            var uuidPedido = UUID.randomUUID();
+            var uuidProduto = UUID.randomUUID();
+
+            when(pedidoRepository.findById(any(UUID.class))).thenReturn(Optional.empty());
+
+            assertThatThrownBy(() -> pedidoProdutoRepositoryPort.excluirPedidoProduto(uuidPedido, uuidProduto))
+                    .isInstanceOf(PedidoNaoEncontradoException.class)
+                            .hasMessage("Pedido não encontrado");
 
             verify(pedidoRepository, times(1)).findById(any(UUID.class));
         }

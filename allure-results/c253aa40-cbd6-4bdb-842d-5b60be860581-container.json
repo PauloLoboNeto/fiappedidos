@@ -1,0 +1,1 @@
+{"uuid":"c253aa40-cbd6-4bdb-842d-5b60be860581","name":"Deve falhar ao criar um Produto a partir de um ProdutoRequest com tipo do produto inválido","children":["95054ec2-b993-41f0-b5fa-8b9a10992f30"],"befores":[],"afters":[],"start":1705779355183,"stop":1705779355185}

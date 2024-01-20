@@ -1,6 +1,8 @@
 package com.fiap.pedidos.gateways;
 
 import com.fiap.pedidos.entities.Produto;
+import com.fiap.pedidos.exceptions.entities.NomeInvalidoException;
+import com.fiap.pedidos.exceptions.entities.ProdutoNaoEncontradoException;
 import com.fiap.pedidos.gateways.entities.ProdutoEntity;
 import com.fiap.pedidos.helpers.Helper;
 import com.fiap.pedidos.interfaces.gateways.IProdutoRepositoryPort;
@@ -21,6 +23,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -160,6 +163,26 @@ class ProdutoRepositoryAdapterTest {
             verify(produtoRepository, times(1)).save(any(ProdutoEntity.class));
             verify(produtoRepository, times(1)).findById(any(UUID.class));
         }
+
+        @Test
+        @Severity(SeverityLevel.BLOCKER)
+        @Description("Remover produto que não existe")
+        void deveFalhar_AoTentaRemoverProdutoQueNaoExiste() {
+            var produto = Helper.gerarProdutoSobremesa();
+            var produtoEntity = new ProdutoEntity().from(produto, true);
+            var idRandom = UUID.randomUUID();
+            produtoEntity.setIdProduto(idRandom);
+
+            when(produtoRepository.findById(any(UUID.class))).thenReturn(Optional.empty());
+            when(produtoRepository.save(any(ProdutoEntity.class))).thenReturn(produtoEntity);
+
+            assertThatThrownBy(() -> produtoRepositoryPort.deletarProduto(idRandom))
+                    .isInstanceOf(ProdutoNaoEncontradoException.class)
+                            .hasMessage("Produto não encontrado");
+
+            verify(produtoRepository, times(1)).findById(any(UUID.class));
+        }
+
     }
 
     @Nested

@@ -3,6 +3,7 @@ package com.fiap.pedidos.usecases;
 import com.fiap.pedidos.entities.Pedido;
 import com.fiap.pedidos.entities.PedidoProduto;
 import com.fiap.pedidos.entities.Produto;
+import com.fiap.pedidos.entities.ValorProduto;
 import com.fiap.pedidos.gateways.entities.PedidoEntity;
 import com.fiap.pedidos.gateways.entities.PedidoProdutoEntity;
 import com.fiap.pedidos.helpers.Helper;
@@ -20,10 +21,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.math.BigDecimal;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -109,6 +108,49 @@ class PedidoProdutoUseCaseImplTest {
                             any(Produto.class),
                             any(PedidoProduto.class));
 
+        }
+    }
+
+    @Nested
+    class RemoverItem {
+        @Test
+        void deveRemoverItemDoPedido() {
+            UUID pedidoId = UUID.randomUUID();
+            UUID produtoId = UUID.randomUUID();
+
+            Pedido pedido = Helper.gerarPedidoComIDComClienteComIDEProdutos();
+            pedido.setIdPedido(pedidoId);
+            Produto produto = Helper.gerarProdutoLanche();
+            produto.setIdProduto(produtoId);
+
+            PedidoProduto pedidoProduto = Helper.gerarPedidoProduto();
+            pedidoProduto.setPedidoId(pedidoId);
+            pedidoProduto.setProdutoId(produtoId);
+
+            List<Produto> produtosAssociadosAoPedido = Collections.singletonList(produto);
+
+            when(pedidoRepositoryPort.buscarPorId(pedidoId)).thenReturn(Optional.of(pedido));
+            when(produtoRepositoryPort.buscarPorId(produtoId)).thenReturn(Optional.of(produto));
+            when(pedidoProdutoRepositoryPort.obterTodosOsProdutosAssociadosAoPedidoPeloIdPedido(pedidoId))
+                    .thenReturn(produtosAssociadosAoPedido);
+
+            Pedido pedidoAtualizado = Helper.gerarPedidoComIDComClienteComIDEProdutos();
+            pedidoAtualizado.setIdPedido(pedidoId);
+            pedidoAtualizado.setDataAtualizacao(new Date());
+
+            doNothing().when(pedidoProdutoRepositoryPort).excluirPedidoProduto(pedidoId, produtoId);
+            when(pedidoRepositoryPort.atualizarPedido(any(Pedido.class))).thenReturn(pedidoAtualizado);
+
+            Pedido resultado = pedidoProdutoUseCase.removerItemDoPedido(pedidoProduto);
+
+            assertThat(resultado).isNotNull();
+            assertThat(resultado.getIdPedido()).isEqualTo(pedidoId);
+
+            verify(pedidoRepositoryPort, times(1)).buscarPorId(pedidoId);
+            verify(produtoRepositoryPort, times(1)).buscarPorId(produtoId);
+            verify(pedidoProdutoRepositoryPort, times(1)).obterTodosOsProdutosAssociadosAoPedidoPeloIdPedido(pedidoId);
+            verify(pedidoProdutoRepositoryPort, times(1)).excluirPedidoProduto(pedidoId, produtoId);
+            verify(pedidoRepositoryPort, times(1)).atualizarPedido(any(Pedido.class));
         }
     }
 }

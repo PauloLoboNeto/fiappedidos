@@ -35,7 +35,15 @@ public class ClienteController {
             );
     }
 
-    @PostMapping(value = {"/", ""}, produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<ClienteDTO> buscarPorId(@PathVariable(name = "id") UUID uuid) {
+        Optional<Cliente> cliente = clienteUseCasePort.buscarPorId(uuid);
+        return cliente
+                .map(value -> ResponseEntity.ok(new ClienteDTO().from(value)))
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    @PostMapping(value = {"/", ""}, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?>  cadastrar(@RequestBody @Validated ClienteRequest clienteRequest) {
         if (Objects.nonNull(clienteRequest)) {
             Cliente clienteDb = clienteUseCasePort.cadastrar(clienteRequest.from(clienteRequest));
@@ -45,15 +53,6 @@ public class ClienteController {
             return ResponseEntity.badRequest().build();
         }
     }
-
-    @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ClienteDTO> buscarPorId(@PathVariable(name = "id") UUID uuid) {
-        Optional<Cliente> cliente = clienteUseCasePort.buscarPorId(uuid);
-        return cliente
-                .map(value -> ResponseEntity.ok(new ClienteDTO().from(value)))
-                .orElseGet(() -> ResponseEntity.notFound().build());
-    }
-
 
     @PostMapping(value = "/{cpf}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> identificarPorCpf(@PathVariable(name = "cpf") String cpf) {

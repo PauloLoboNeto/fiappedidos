@@ -54,10 +54,6 @@ public final class Cpf {
         return true;
     }
 
-    public boolean isInvalid() {
-        return !isValid();
-    }
-
     public boolean isValid() {
         // considera-se erro CPF's formados por uma sequencia de numeros iguais
         Matcher matcher = REGEX_CPF_NUMERO_REPETIDO.matcher(getCpf());

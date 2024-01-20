@@ -1,0 +1,1 @@
+{"uuid":"7ec6b1a6-b83e-4e87-9b35-b7ca8e0b53af","name":"Deve falhar ao criar um Cliente a partir de um ClienteRequest com email inválido","children":["0e676b99-fce8-4d66-8ecd-113b54f0596a"],"befores":[],"afters":[],"start":1705778828960,"stop":1705778828964}

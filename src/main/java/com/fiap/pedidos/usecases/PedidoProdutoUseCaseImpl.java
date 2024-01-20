@@ -101,7 +101,7 @@ public class PedidoProdutoUseCaseImpl implements IPedidoProdutoUseCasePort {
 
     private void validarProduto(Optional<Produto> optionalProduto) {
         if (optionalProduto.isEmpty()) {
-            throw new ProdutoNaoEncontradoException("Produto não encontrado.");
+            throw new ProdutoNaoEncontradoException();
         }
     }
 }

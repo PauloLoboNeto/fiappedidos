@@ -9,7 +9,6 @@ import lombok.ToString;
 @Getter
 @EqualsAndHashCode
 @ToString
-@NoArgsConstructor
 public final class DescricaoProduto {
 
     private String descricao;

@@ -10,8 +10,6 @@ public final class Email {
     public static final Pattern REGEX_EMAIL_VALIDO = Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$", Pattern.CASE_INSENSITIVE);
     private String email;
 
-    Email() {}
-
     public Email(String email) {
         this.email = Objects.nonNull(email) ? email : "";
         Matcher matcher = REGEX_EMAIL_VALIDO.matcher(email);
@@ -24,14 +22,6 @@ public final class Email {
         return this.email;
     };
 
-    public boolean isInvalid() {
-        return !isValid();
-    }
-
-    public boolean isValid() {
-        Matcher matcher = REGEX_EMAIL_VALIDO.matcher(email);
-        return matcher.find();
-    }
 
     @Override
     public String toString() {
@@ -56,10 +46,7 @@ public final class Email {
             return false;
         Email other = (Email) obj;
         if (email == null) {
-            if (other.email != null)
-                return false;
-        } else if (!email.equals(other.email))
-            return false;
-        return true;
+            return other.email == null;
+        } else return email.equals(other.email);
     }
 }

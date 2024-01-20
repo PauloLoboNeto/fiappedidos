@@ -44,7 +44,7 @@ public class PedidoRepositoryAdapter implements IPedidoRepositoryPort {
     @Transactional
     public void remover(UUID idPedido) {
         PedidoEntity pedidoEntity = this.pedidoRepository.findById(idPedido)
-                .orElseThrow(() -> new PedidoNaoEncontradoException("Pedido not found, id: " + idPedido));
+                .orElseThrow(PedidoNaoEncontradoException::new);
 
         if(Objects.nonNull(pedidoEntity.getProdutos()) && !pedidoEntity.getProdutos().isEmpty())
             pedidoEntity.getProdutos().forEach(pedidoProdutoEntity -> {

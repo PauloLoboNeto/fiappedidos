@@ -3,7 +3,6 @@ package com.fiap.pedidos.exceptions.handlers;
 import com.fiap.pedidos.controllers.PedidoController;
 import com.fiap.pedidos.exceptions.entities.PedidoNaoEncontradoException;
 import com.fiap.pedidos.exceptions.entities.PedidoOperacaoNaoSuportadaException;
-import com.fiap.pedidos.exceptions.entities.PedidoProdutoNaoEncontradoException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,11 +21,5 @@ public class PedidoExceptionHandler {
     public ResponseEntity<StandardError> pedidoOperacaoNaoSuportada(PedidoOperacaoNaoSuportadaException e, HttpServletRequest request){
         StandardError err = new StandardError(System.currentTimeMillis(), HttpStatus.BAD_REQUEST.value(), "Operação não suportada, verifique o status do pedido", e.getMessage(), request.getRequestURI());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(err);
-    }
-
-    @ExceptionHandler(PedidoProdutoNaoEncontradoException.class)
-    public ResponseEntity<StandardError> pedidoProdutoNaoEncontrado(PedidoProdutoNaoEncontradoException e, HttpServletRequest request){
-        StandardError err = new StandardError(System.currentTimeMillis(), HttpStatus.NOT_FOUND.value(), "Produto não encontrado", e.getMessage(), request.getRequestURI());
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(err);
     }
 }
