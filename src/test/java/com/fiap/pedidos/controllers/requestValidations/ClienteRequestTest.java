@@ -54,6 +54,12 @@ class ClienteRequestTest {
             assertThat(cliente.getNome()).isEqualToComparingFieldByField(new Nome("John Doe"));
             assertThat(cliente.getCpf()).isEqualToComparingFieldByField(new Cpf("11111111111"));
             assertThat(cliente.getEmail()).isEqualToComparingFieldByField(new Email("john.doe@example.com"));
+
+            assertThat(cliente.getEmail().hashCode()).isEqualTo(new Email("john.doe@example.com").hashCode());
+            assertThat(cliente.getEmail().equals(new Email("john.doe@example.com"))).isTrue();
+
+            assertThat(cliente.getCpf().hashCode()).isEqualTo(new Cpf("11111111111").hashCode());
+            assertThat(cliente.getCpf().equals(new Cpf("11111111111"))).isTrue();
         }
 
         @Test

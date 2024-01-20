@@ -11,7 +11,6 @@ public final class Nome implements Comparable<Nome> {
     private static final int minimoCaracter = 2;
     private static final int maximoCaracter = 6;
 
-    Nome() {}
 
     public Nome (String valor) {
         if (Objects.nonNull(valor)) {
@@ -24,10 +23,6 @@ public final class Nome implements Comparable<Nome> {
 
     public String getNome() {
         return this.nome;
-    }
-
-    public boolean isValid() {
-        return !isInvalid();
     }
 
     public boolean isInvalid() {
