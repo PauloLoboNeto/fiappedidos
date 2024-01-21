@@ -11,6 +11,7 @@ public final class Nome implements Comparable<Nome> {
     private static final int minimoCaracter = 2;
     private static final int maximoCaracter = 6;
 
+    public Nome(){}
 
     public Nome (String valor) {
         if (Objects.nonNull(valor)) {

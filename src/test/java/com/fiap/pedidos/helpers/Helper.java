@@ -168,6 +168,14 @@ public class Helper {
         return clienteRequest;
     }
 
+    public static ClienteRequest gerarClienteComCPFParametrizadoRequest(String cpf) {
+        var clienteRequest = new ClienteRequest();
+        clienteRequest.setEmail("cliente1@gmail.com");
+        clienteRequest.setNome("Cliente 1");
+        clienteRequest.setCpf(cpf);
+        return clienteRequest;
+    }
+
     public static ProdutoRequest gerarProdutoRequest(TipoProduto tipoProduto) {
         var produtoRequest = new ProdutoRequest();
         produtoRequest.setDescricao("Descricao 1");

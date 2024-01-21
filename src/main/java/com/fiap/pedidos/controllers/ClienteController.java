@@ -40,7 +40,7 @@ public class ClienteController {
         Optional<Cliente> cliente = clienteUseCasePort.buscarPorId(uuid);
         return cliente
                 .map(value -> ResponseEntity.ok(new ClienteDTO().from(value)))
-                .orElseGet(() -> ResponseEntity.notFound().build());
+                .orElseGet(() -> ResponseEntity.noContent().build());
     }
 
     @PostMapping(value = {"/", ""}, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -68,8 +68,13 @@ public class ClienteController {
     @PostMapping(value = "/id", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> identificarSemCPF() {
         UUID idCliente = clienteUseCasePort.gerarId();
+        ClienteDTO dto = new ClienteDTO();
+        dto.setId(idCliente);
         URI uri = ServletUriComponentsBuilder.fromCurrentContextPath().path("/tech-challenge/clientes/{id}").buildAndExpand(idCliente).toUri();
-        return ResponseEntity.status(HttpStatus.CREATED).header(HttpHeaders.LOCATION, uri.toString()).body(idCliente);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .contentType(MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.LOCATION, uri.toString())
+                .body(dto);
     }
 
 }
