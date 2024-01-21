@@ -18,7 +18,10 @@ jobs:
       - name: Configurar JDK
         uses: actions/setup-java@v2
         with:
+          distribution: 'adopt'
           java-version: '17'
+          java-package: 'jdk'
+          architecture: 'x64'
 
       - name: Construir com Maven
         run: mvn clean install
