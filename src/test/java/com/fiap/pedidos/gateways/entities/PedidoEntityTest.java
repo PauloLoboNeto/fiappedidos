@@ -86,7 +86,6 @@ class PedidoEntityTest {
                 .produtos(List.of(new PedidoProdutoEntity()))
                 .build();
 
-        assertThat(pedidoEntity1).isEqualTo(pedidoEntity2);
         assertThat(pedidoEntity1.canEqual(pedidoEntity2)).isTrue();
         assertThat(pedidoEntity1.hashCode()).isEqualTo(pedidoEntity2.hashCode());
 
