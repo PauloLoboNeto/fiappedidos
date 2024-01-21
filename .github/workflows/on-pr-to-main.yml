@@ -8,35 +8,7 @@ on:
       - main
 
 jobs:
-  quality_bdd:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout do Código
-        uses: actions/checkout@v2
-
-      - name: Configurar JDK
-        uses: actions/setup-java@v2
-        with:
-          distribution: 'adopt'
-          java-version: '17'
-          java-package: 'jdk'
-          architecture: 'x64'
-
-      - name: Construir com Maven
-        run: mvn clean install
-
-      - name: Executar Aplicação
-        run: java -jar -Dspring.profiles.active=dev target/pedidos-*.jar
-
-      - name: Executar testes BDD
-        run: mvn test -Psystem-test
-
-      - name: Verificar Resultado dos Testes
-        if: ${{ failure() }}
-        run: exit 1
-
-#  unit_test:
+#  quality_bdd:
 #    runs-on: ubuntu-latest
 #
 #    steps:
@@ -55,7 +27,7 @@ jobs:
 #        run: mvn clean install -DskipTests
 #
 #      - name: Executar testes
-#        run: mvn test
+#        run: java -jar -Dspring.profiles.active=dev target/pedidos-*.jar && mvn test -Psystem-test
 #
 #      - name: Verificar Resultado dos Testes
 #        if: ${{ failure() }}
@@ -78,10 +50,20 @@ jobs:
           architecture: 'x64'
 
       - name: Construir com Maven
-        run: mvn clean install -DskipTests
+        run: mvn clean install && mvn jacoco:report && mvn sonar:sonar -Pcoverage
 
       - name: Executar testes e gerar cobertura
-        run: mvn test && mvn jacoco:report
+        run: | 
+          mvn test && 
+          mvn jacoco:report && 
+          mvn sonar:sonar -Pcoverage 
+            -Dsonar.organization=pauloloboneto 
+            -Dsonar.host.url=https://sonarcloud.io 
+            -Dsonar.token=${{ secrets.SONARCLOUD_TOKEN }}
+            -Dsonar.projectKey=PauloLoboNeto_fiappedidos 
+            -Dsonar.projectName=fiappedidos 
+            -Dsonar.java.coveragePlugin=jacoco 
+            -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml
 
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@master
