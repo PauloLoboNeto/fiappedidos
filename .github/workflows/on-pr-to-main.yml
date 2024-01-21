@@ -50,7 +50,7 @@ jobs:
           architecture: 'x64'
 
       - name: Executar testes e gerar cobertura
-        run: mvn clean install && mvn jacoco:report
+        run: mvn clean install -Pcoverage
 
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@master
