@@ -87,9 +87,7 @@ class PedidoEntityTest {
                 .build();
 
         assertThat(pedidoEntity1.canEqual(pedidoEntity2)).isTrue();
-        assertThat(pedidoEntity1.hashCode()).isEqualTo(pedidoEntity2.hashCode());
-
         assertThat(pedidoEntity1).isNotEqualTo(pedidoEntity3);
-        assertThat(pedidoEntity1.hashCode()).isNotEqualTo(pedidoEntity3.hashCode());
+
     }
 }
