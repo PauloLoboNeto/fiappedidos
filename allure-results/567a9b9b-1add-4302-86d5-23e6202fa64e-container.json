@@ -1,1 +1,0 @@
-{"uuid":"567a9b9b-1add-4302-86d5-23e6202fa64e","name":"Deve falhar ao criar um Cliente a partir de um ClienteRequest com nome inválido","children":["e81518aa-d9e2-4971-8608-8e82e3d9bb7f"],"befores":[],"afters":[],"start":1705778828956,"stop":1705778828959}

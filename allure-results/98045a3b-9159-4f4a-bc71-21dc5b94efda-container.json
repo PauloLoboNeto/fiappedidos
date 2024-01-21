@@ -1,1 +1,0 @@
-{"uuid":"98045a3b-9159-4f4a-bc71-21dc5b94efda","name":"Deve falhar ao criar um Produto a partir de um ProdutoRequest com descricacao maior que o permitido","children":["3e7684a0-577e-4dee-a8b3-d89a0cf86384"],"befores":[],"afters":[],"start":1705768061931,"stop":1705768061933}

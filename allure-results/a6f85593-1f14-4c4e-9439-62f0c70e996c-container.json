@@ -1,1 +1,0 @@
-{"uuid":"a6f85593-1f14-4c4e-9439-62f0c70e996c","name":"Deve falhar ao criar um Cliente a partir de um ClienteRequest com cpf inválido","children":["c9df5769-efaa-4e27-87eb-742d24461e40"],"befores":[],"afters":[],"start":1705767273630,"stop":1705767273830}
