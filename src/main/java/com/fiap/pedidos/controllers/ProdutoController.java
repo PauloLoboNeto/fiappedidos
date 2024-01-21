@@ -25,11 +25,15 @@ public class ProdutoController {
     private final IProdutoUseCasePort produtoUseCasePort;
 
     @GetMapping(value = {"/", ""}, produces = "application/json")
-    public ResponseEntity<List<ProdutoDTO>> buscarProdutos(@RequestParam(value="tipo_produto") @Validated @NotBlank String tipoProduto) {
+    public ResponseEntity<List<ProdutoDTO>> buscarProdutos(
+            @RequestParam(value="tipo_produto") @Validated @NotBlank String tipoProduto) {
+
         List<Produto> produtoArrayList = this.produtoUseCasePort
                 .listarProdutosPorTipoProduto(TipoProduto.fromCodigo(tipoProduto));
+
         final var produtoDTOList = new ArrayList<ProdutoDTO>();
-        produtoArrayList.forEach(produto -> produtoDTOList.add(new ProdutoDTO().from(produto)));
+
+        produtoArrayList.forEach(produto -> produtoDTOList.add(ProdutoDTO.from(produto)));
 
         if(produtoDTOList.isEmpty())
             return new ResponseEntity<>(produtoDTOList, HttpStatus.NO_CONTENT);
@@ -40,7 +44,7 @@ public class ProdutoController {
     @PostMapping(value = {"/", ""}, produces = "application/json")
     public ResponseEntity<?> criarProduto(@RequestBody @Validated ProdutoRequest request) {
         Produto produto = this.produtoUseCasePort.criarProduto(request.from(request));
-        return new ResponseEntity<>(new ProdutoDTO().from(produto), HttpStatus.CREATED);
+        return new ResponseEntity<>(ProdutoDTO.from(produto), HttpStatus.CREATED);
     }
 
     @DeleteMapping(value = "/{id}", produces = "application/json")

@@ -13,6 +13,8 @@ public final class DescricaoProduto {
 
     private String descricao;
 
+    public DescricaoProduto(){}
+
     public DescricaoProduto(String descricaoProduto) {
         if(255 < descricaoProduto.length()) {
             throw new DescricaoProdutoInvalidoException();

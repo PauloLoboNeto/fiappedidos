@@ -32,13 +32,10 @@ public class ClientesCenarioStepsDefinition {
         var retorno = response.getBody().jsonPath().getList("");
 
         if(!retorno.isEmpty()) {
-            System.out.println(retorno);
-                retorno.forEach(res -> {
-                        ClienteDTO clienteDTO = objectMapper.convertValue(res, ClienteDTO.class);
-                        if (clienteDTO.getCpf().equalsIgnoreCase(cpf)) {
-                            fail("CPF já existe.");
-                        }
-                });
+            retorno.forEach(res -> {
+                ClienteDTO clienteDTO = objectMapper.convertValue(res, ClienteDTO.class);
+                if (clienteDTO.getCpf().equalsIgnoreCase(cpf)) fail("CPF já existe.");
+            });
         }
     }
 
