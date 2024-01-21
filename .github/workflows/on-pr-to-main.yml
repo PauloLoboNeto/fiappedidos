@@ -36,12 +36,38 @@ jobs:
         if: ${{ failure() }}
         run: exit 1
 
-  unit_test:
-    runs-on: ubuntu-latest
+#  unit_test:
+#    runs-on: ubuntu-latest
+#
+#    steps:
+#      - name: Checkout do Código
+#        uses: actions/checkout@v2
+#
+#      - name: Configurar JDK
+#        uses: actions/setup-java@v2
+#        with:
+#          distribution: 'adopt'
+#          java-version: '17'
+#          java-package: 'jdk'
+#          architecture: 'x64'
+#
+#      - name: Construir com Maven
+#        run: mvn clean install -DskipTests
+#
+#      - name: Executar testes
+#        run: mvn test
+#
+#      - name: Verificar Resultado dos Testes
+#        if: ${{ failure() }}
+#        run: exit 1
 
+  sonarcloud:
+    name: SonarCloud
+    runs-on: ubuntu-latest
     steps:
-      - name: Checkout do Código
-        uses: actions/checkout@v2
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
 
       - name: Configurar JDK
         uses: actions/setup-java@v2
@@ -52,23 +78,13 @@ jobs:
           architecture: 'x64'
 
       - name: Construir com Maven
-        run: mvn clean install
+        run: mvn clean install -DskipTests
 
-      - name: Executar testes
-        run: mvn test
+      - name: Executar testes e gerar cobertura
+        run: mvn test && mvn jacoco:report
 
-      - name: Verificar Resultado dos Testes
-        if: ${{ failure() }}
-        run: exit 1
-
-#  sonarcloud:
-#    name: SonarCloud
-#    runs-on: ubuntu-latest
-#    steps:
-#      - uses: actions/checkout@v3
-#        with:
-#          fetch-depth: 0
-#      - name: SonarCloud Scan
-#        uses: SonarSource/sonarcloud-github-action@master
-#        env:
-#          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.CI_CD }}
+          SONAR_TOKEN: ${{ secrets.SONARCLOUD_TOKEN }}
