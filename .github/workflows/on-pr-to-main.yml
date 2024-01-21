@@ -8,30 +8,39 @@ on:
       - main
 
 jobs:
-#  quality_bdd:
-#    runs-on: ubuntu-latest
-#
-#    steps:
-#      - name: Checkout do Código
-#        uses: actions/checkout@v2
-#
-#      - name: Configurar JDK
-#        uses: actions/setup-java@v2
-#        with:
-#          distribution: 'adopt'
-#          java-version: '17'
-#          java-package: 'jdk'
-#          architecture: 'x64'
-#
-#      - name: Construir com Maven
-#        run: mvn clean install -DskipTests
-#
-#      - name: Executar testes
-#        run: java -jar -Dspring.profiles.active=dev target/pedidos-*.jar && mvn test -Psystem-test
-#
-#      - name: Verificar Resultado dos Testes
-#        if: ${{ failure() }}
-#        run: exit 1
+  quality_bdd:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout do Código
+        uses: actions/checkout@v2
+
+      - name: Configurar JDK
+        uses: actions/setup-java@v2
+        with:
+          distribution: 'adopt'
+          java-version: '17'
+          java-package: 'jdk'
+          architecture: 'x64'
+
+      - name: Construir com Maven
+        run: mvn clean install -DskipTests
+
+      - name: Executar testes
+        run: mvn spring-boot:run -Dspring.profiles.active=dev &
+
+      - name: Aguardar Inicialização
+        run: sleep 30s
+
+      - name: Executar BDD
+        run: mvn test -Psystem-test
+
+      - name: Encerrar Aplicação
+        run: pkill -f "java -jar"
+
+      - name: Verificar Resultado dos Testes
+        if: ${{ failure() }}
+        run: exit 1
 
   sonarcloud:
     name: SonarCloud
