@@ -15,6 +15,7 @@
     <description>Pedido Microservice</description>
     <properties>
         <java.version>17</java.version>
+        <packaging>jar</packaging>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -244,21 +245,32 @@
     </build>
     <profiles>
         <profile>
-            <id>integration-test</id>
+            <id>coverage</id>
             <build>
                 <plugins>
                     <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-surefire-plugin</artifactId>
-                        <version>3.1.2</version>
-                        <configuration>
-                            <includes combine.self="override">
-                                <include>**/*IT.java</include>
-                            </includes>
-                            <excludes combine.self="override">
-                                <exclude>**/*Test.java</exclude>
-                            </excludes>
-                        </configuration>
+                        <groupId>org.jacoco</groupId>
+                        <artifactId>jacoco-maven-plugin</artifactId>
+                        <version>0.8.7</version>
+                        <executions>
+                            <execution>
+                                <id>prepare-agent</id>
+                                <goals>
+                                    <goal>prepare-agent</goal>
+                                </goals>
+                            </execution>
+                            <execution>
+                                <id>report</id>
+                                <goals>
+                                    <goal>report</goal>
+                                </goals>
+                                <configuration>
+                                    <formats>
+                                        <format>XML</format>
+                                    </formats>
+                                </configuration>
+                            </execution>
+                        </executions>
                     </plugin>
                 </plugins>
             </build>

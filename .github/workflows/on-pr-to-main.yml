@@ -1,0 +1,68 @@
+name: Steps validate on PR
+
+on:
+  pull_request:
+    types:
+      - opened
+    branches:
+      - main
+
+jobs:
+  quality_bdd:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout do Código
+        uses: actions/checkout@v2
+
+      - name: Configurar JDK
+        uses: actions/setup-java@v2
+        with:
+          java-version: '17'
+
+      - name: Construir com Maven
+        run: mvn clean install
+
+      - name: Executar Aplicação
+        run: java -jar -Dspring.profiles.active=dev target/pedidos-${project.version}.jar
+
+      - name: Executar testes BDD
+        run: mvn test -Psystem-test
+
+      - name: Verificar Resultado dos Testes
+        if: ${{ failure() }}
+        run: exit 1
+
+  unit_test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout do Código
+        uses: actions/checkout@v2
+
+      - name: Configurar JDK
+        uses: actions/setup-java@v2
+        with:
+          java-version: '17'
+
+      - name: Construir com Maven
+        run: mvn clean install
+
+      - name: Executar testes
+        run: mvn test
+
+      - name: Verificar Resultado dos Testes
+        if: ${{ failure() }}
+        run: exit 1
+
+#  sonarcloud:
+#    name: SonarCloud
+#    runs-on: ubuntu-latest
+#    steps:
+#      - uses: actions/checkout@v3
+#        with:
+#          fetch-depth: 0
+#      - name: SonarCloud Scan
+#        uses: SonarSource/sonarcloud-github-action@master
+#        env:
+#          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
