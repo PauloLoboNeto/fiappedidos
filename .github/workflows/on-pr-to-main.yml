@@ -49,12 +49,9 @@ jobs:
           java-package: 'jdk'
           architecture: 'x64'
 
-      - name: Construir com Maven
-        run: mvn clean install && mvn jacoco:report && mvn sonar:sonar -Pcoverage
-
       - name: Executar testes e gerar cobertura
         run: | 
-          mvn test && 
+          mvn clean install && 
           mvn jacoco:report && 
           mvn sonar:sonar -Pcoverage 
             -Dsonar.organization=pauloloboneto 
