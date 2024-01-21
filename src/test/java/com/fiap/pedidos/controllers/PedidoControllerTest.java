@@ -1,11 +1,7 @@
 package com.fiap.pedidos.controllers;
 
-import com.fiap.pedidos.adapters.PedidoDTO;
-import com.fiap.pedidos.controllers.PedidoController;
-import com.fiap.pedidos.controllers.requestValidations.PedidoProdutoRequest;
 import com.fiap.pedidos.controllers.requestValidations.PedidoRequest;
 import com.fiap.pedidos.entities.Cliente;
-import com.fiap.pedidos.entities.Cpf;
 import com.fiap.pedidos.entities.Pedido;
 import com.fiap.pedidos.entities.PedidoProduto;
 import com.fiap.pedidos.helpers.Helper;
@@ -13,13 +9,10 @@ import com.fiap.pedidos.interfaces.facade.IServiceAsyncProcessWebhook;
 import com.fiap.pedidos.interfaces.usecases.IClienteUseCasePort;
 import com.fiap.pedidos.interfaces.usecases.IPedidoProdutoUseCasePort;
 import com.fiap.pedidos.interfaces.usecases.IPedidoUseCasePort;
-import com.fiap.pedidos.utils.enums.StatusPedido;
 import com.fiap.pedidos.utils.enums.TipoAtualizacao;
-import com.fiap.pedidos.utils.enums.TipoProduto;
 import io.qameta.allure.Description;
 import io.qameta.allure.Severity;
 import io.qameta.allure.SeverityLevel;
-import jakarta.validation.constraints.NotNull;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -27,18 +20,13 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
