@@ -1,5 +1,5 @@
 # language: pt
-Funcionalidade: Clientes
+Funcionalidade: Cadastrar Cliente
 
   Cenario: Cadastrar Cliente
     Dado que o cliente de CPF "88888888888" não está cadastrado

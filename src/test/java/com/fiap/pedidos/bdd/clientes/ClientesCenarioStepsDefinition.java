@@ -14,9 +14,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 public class ClientesCenarioStepsDefinition {
     private Response response;
-
     private String cpf;
-
     private final String BASE_URI = "http://localhost:9091";
     private final String BASE_PATH = "/tech-challenge/clientes";
 
@@ -44,7 +42,6 @@ public class ClientesCenarioStepsDefinition {
         }
     }
 
-
     @Quando("o cliente decide se cadastrar")
     public void cadastrarCliente(){
         var clienteRequest = Helper.gerarClienteComCPFParametrizadoRequest(this.cpf);
@@ -71,7 +68,6 @@ public class ClientesCenarioStepsDefinition {
         if(!resposta.getCpf().equalsIgnoreCase(this.cpf))
             fail("Erro ao buscar cliente. Cliente com o CPF " + cpf + "não existe na base.");
     }
-
 
     @Quando("o cliente decide se identificar pelo CPF")
     public void identificarPorCpf(){
