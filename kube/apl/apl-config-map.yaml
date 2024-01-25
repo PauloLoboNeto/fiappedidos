@@ -1,0 +1,20 @@
+# Create a configmap
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: apl-pedidos-config
+  labels:
+    app: apl-pedidos
+data:
+  DATASOURCE_INITIALIZATION_MODE: always
+  DATASOURCE_INITIALIZE: 'true'
+  DATASOURCE_CONTINUE_ON_ERROR: 'true'
+  HIBERNATE_DIALECT: org.hibernate.dialect.PostgreSQLDialect
+  HIBERNATE_SHOW_SQL: 'true'
+  HIBERNATE_DDL_AUTO: update
+  SERVER_PORT: 9091
+  FILA_URL: http://localhost:9092/tech-challenge/fila
+  PAGAMENTOS_URL: http://localhost:9090/tech-challenge/pagamento
+  SERVLET_CONTEXT_PATH: /tech-challenge
+  FEIGN_CONNECT_TIMEOUT: 14000
+  FEIGN_READ_TIMEOUT: 14000
