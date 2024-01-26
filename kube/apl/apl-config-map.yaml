@@ -13,7 +13,7 @@ data:
   HIBERNATE_SHOW_SQL: 'true'
   HIBERNATE_DDL_AUTO: update
   SERVER_PORT: '9091'
-  FILA_URL: http://acd652e434c7140808cb5801d25eea90-928075136.us-east-1.elb.amazonaws.com:9092/tech-challenge/fila
+  FILA_URL: http://aca758356d4254815ab7419e0c58b321-1695289611.us-east-1.elb.amazonaws.com:9092/tech-challenge/fila
   PAGAMENTOS_URL: http://acd652e434c7140808cb5801d25eea90-928075136.us-east-1.elb.amazonaws.com:9090/tech-challenge/pagamento
   SERVLET_CONTEXT_PATH: /tech-challenge
   FEIGN_CONNECT_TIMEOUT: '14000'
