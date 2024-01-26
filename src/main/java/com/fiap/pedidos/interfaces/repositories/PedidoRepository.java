@@ -16,7 +16,7 @@ public interface PedidoRepository extends JpaRepository<PedidoEntity, UUID> {
     nativeQuery = true)
     List<PedidoEntity> findByIdClienteAndStatusPedido(UUID idCliente, String statusPedido);
 
-    @Query(value = "SELECT * FROM pedidos WHERE id_status NOT LIKE 'F' ORDER BY CASE id_status WHEN 'C' THEN 1 WHEN 'E' THEN 2 WHEN 'R' THEN 3 WHEN 'A' THEN 4 END ASC, dt_h_inclusao ASC",
+    @Query(value = "SELECT * FROM pedidos WHERE id_status NOT LIKE 'P' ORDER BY CASE id_status WHEN 'C' THEN 1 WHEN 'E' THEN 2 WHEN 'R' THEN 3 WHEN 'A' THEN 4 END ASC, dt_h_inclusao ASC",
             nativeQuery = true)
     List<PedidoEntity> listagemOrdenadaPorStatusExcluindoFinalizados(Pageable pageable);
 }
