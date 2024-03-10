@@ -85,6 +85,11 @@ spec:
                 configMapKeyRef:
                   name: apl-pedidos-config
                   key: QUEUE_FILA_PEDIDO
+            - name: queue.update.pedido
+              valueFrom:
+                configMapKeyRef:
+                  name: apl-pedidos-config
+                  key: QUEUE_UPDATE_PEDIDO
 
           ports:
             - containerPort: 9091

@@ -9,7 +9,6 @@ import org.springframework.scheduling.annotation.EnableAsync;
 
 
 @SpringBootApplication
-@EnableAsync
 @EnableFeignClients
 @ImportAutoConfiguration({FeignAutoConfiguration.class})
 public class PedidosApplication {

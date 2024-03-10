@@ -6,11 +6,9 @@ import com.fiap.pedidos.controllers.requestValidations.PedidoRequest;
 import com.fiap.pedidos.entities.Cliente;
 import com.fiap.pedidos.entities.Pedido;
 import com.fiap.pedidos.entities.PedidoProduto;
-import com.fiap.pedidos.interfaces.facade.IServiceAsyncProcessWebhook;
 import com.fiap.pedidos.interfaces.usecases.IClienteUseCasePort;
 import com.fiap.pedidos.interfaces.usecases.IPedidoProdutoUseCasePort;
 import com.fiap.pedidos.interfaces.usecases.IPedidoUseCasePort;
-import com.fiap.pedidos.utils.enums.StatusPedido;
 import com.fiap.pedidos.utils.enums.TipoAtualizacao;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
@@ -35,7 +33,6 @@ public class PedidoController {
     private final IPedidoUseCasePort pedidoUseCasePort;
     private final IPedidoProdutoUseCasePort pedidoProdutoUseCasePort;
     private final IClienteUseCasePort clienteUseCasePort;
-    private final IServiceAsyncProcessWebhook serviceAsyncProcessWebhook;
 
     @PostMapping(value = {"/", ""},
             produces = MediaType.APPLICATION_JSON_VALUE,
@@ -100,30 +97,4 @@ public class PedidoController {
         var pedidoDto = PedidoDTO.from(pedidoUseCasePort.buscarPorId(idPedido));
         return new ResponseEntity<>(pedidoDto, HttpStatus.OK);
     }
-
-    //Utilizado pelo app de fila ao atualizar fila
-    @PutMapping(
-            value = "/{idPedido}/status/{status}",
-            produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<PedidoDTO> atualizarStatusDoPedido(
-            @PathVariable("idPedido") UUID idPedido,
-            @PathVariable("status") StatusPedido status) {
-        PedidoDTO pedidoDTO = PedidoDTO.from(
-                pedidoUseCasePort.atualizarPedido(
-                        idPedido,
-                        TipoAtualizacao.F,
-                        null,
-                        status)
-        );
-        return ResponseEntity.ok().body(pedidoDTO);
-    }
-
-    //Utilizado pelo app de pagamentos ao atualizar status do pagamento
-    @PutMapping(value = "/{idPedido}/webhook")
-    public ResponseEntity<String> atualizarStatusDoPagamentoDoPedido(
-            @PathVariable UUID idPedido) {
-        this.serviceAsyncProcessWebhook.processarWebhook(idPedido);
-        return new ResponseEntity<String>("Requisição recebida e processamento iniciado.", HttpStatus.OK);
-    }
-
 }

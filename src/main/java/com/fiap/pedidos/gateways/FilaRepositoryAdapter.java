@@ -22,7 +22,7 @@ public class FilaRepositoryAdapter implements IFilaRepositoryPort {
     public void inserePedidoNaFila(UUID idPedido, UUID idCliente) {
         this.sqsTemplate.send(nomeDaFila,
                 MessageBuilder
-                        .withPayload("{id_pedido:" + idPedido + ", id_cliente:" + idCliente + "}")
+                        .withPayload("{\"idPedido\":\"" + idPedido + "\", \"idCliente\":\"" + idCliente + "\"}")
                         .build());
     }
 }

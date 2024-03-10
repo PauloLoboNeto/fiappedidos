@@ -1,7 +1,7 @@
 package com.fiap.pedidos.gateways;
 
 import com.fiap.pedidos.interfaces.gateways.IFilaRepositoryPort;
-import com.fiap.pedidos.interfaces.repositories.FilaRepository;
+import io.awspring.cloud.sqs.operations.SqsTemplate;
 import io.qameta.allure.Description;
 import io.qameta.allure.Severity;
 import io.qameta.allure.SeverityLevel;
@@ -15,6 +15,7 @@ import org.mockito.MockitoAnnotations;
 import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 class FilaRepositoryAdapterTest {
@@ -22,7 +23,7 @@ class FilaRepositoryAdapterTest {
     private IFilaRepositoryPort filaRepositoryPortAdapter;
 
     @Mock
-    private FilaRepository filaRepository;
+    private SqsTemplate sqsTemplate;
 
     AutoCloseable mock;
 
@@ -43,10 +44,10 @@ class FilaRepositoryAdapterTest {
         @Severity(SeverityLevel.BLOCKER)
         @Description("Inserir pedido na fila")
         void deveInserirPedidoNaFila() {
-            doNothing().when(filaRepository).inserePedidoNaFila(any(UUID.class), any(UUID.class));
+            doNothing().when(sqsTemplate).send(anyString(), any());
             filaRepositoryPortAdapter.inserePedidoNaFila(UUID.randomUUID(), UUID.randomUUID());
-            verify(filaRepository, times(1))
-                    .inserePedidoNaFila(any(UUID.class), any(UUID.class));
+            verify(sqsTemplate, times(1))
+                    .send(anyString(), any());
         }
     }
 }
