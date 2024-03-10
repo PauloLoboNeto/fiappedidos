@@ -29,7 +29,7 @@ class FilaRepositoryAdapterTest {
     @BeforeEach
     void setup(){
         mock = MockitoAnnotations.openMocks(this);
-        filaRepositoryPortAdapter = new FilaRepositoryAdapter(filaRepository);
+//        filaRepositoryPortAdapter = new FilaRepositoryAdapter();
     }
 
     @AfterEach

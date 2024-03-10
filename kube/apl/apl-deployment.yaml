@@ -80,6 +80,11 @@ spec:
                 configMapKeyRef:
                   name: apl-pedidos-config
                   key: FEIGN_READ_TIMEOUT
+            - name: queue.fila.pedido
+              valueFrom:
+                configMapKeyRef:
+                  name: apl-pedidos-config
+                  key: QUEUE_FILA_PEDIDO
 
           ports:
             - containerPort: 9091

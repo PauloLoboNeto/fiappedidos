@@ -38,8 +38,6 @@ public class ListenerOfSecrets implements ApplicationListener<ApplicationPrepare
         String dbPort = getString(secretJson, "port");
         String dbName = getString(secretJson, "dbname");
 
-        System.out.println(secretJson);
-
         ConfigurableEnvironment environment = event.getApplicationContext().getEnvironment();
         Properties props = new Properties();
         props.put(SPRING_DATASOURCE_PASSWORD, dbPassword);

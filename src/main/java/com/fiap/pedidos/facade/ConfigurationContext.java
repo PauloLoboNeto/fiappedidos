@@ -1,8 +1,6 @@
 package com.fiap.pedidos.facade;
 
-import com.fiap.pedidos.gateways.PagamentoRepositoryAdapter;
 import com.fiap.pedidos.interfaces.gateways.*;
-import com.fiap.pedidos.interfaces.repositories.PagamentoRepository;
 import com.fiap.pedidos.interfaces.usecases.IClienteUseCasePort;
 import com.fiap.pedidos.interfaces.usecases.IPedidoProdutoUseCasePort;
 import com.fiap.pedidos.interfaces.usecases.IPedidoUseCasePort;
@@ -16,11 +14,6 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class ConfigurationContext {
-
-//    @Bean
-//    public IPagamentoRepositoryPort pagamentoRepositoryPort(PagamentoRepository pagamentoRepository) {
-//        return new PagamentoRepositoryAdapter(pagamentoRepository);
-//    }
 
     @Bean
     public IProdutoUseCasePort produtoUseCasePort(IProdutoRepositoryPort produtoRepositoryPort) {
