@@ -1,18 +1,11 @@
 package com.fiap.pedidos.sqslisteners;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fiap.pedidos.interfaces.usecases.IPedidoUseCasePort;
 import com.fiap.pedidos.sqslisteners.request.AtualizaPedidoFila;
 import com.fiap.pedidos.utils.enums.TipoAtualizacao;
 import io.awspring.cloud.sqs.annotation.SqsListener;
-import io.awspring.cloud.sqs.config.SqsListenerConfigurer;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
-import org.springframework.messaging.converter.MappingJackson2MessageConverter;
-import org.springframework.util.MimeType;
 
 @Configuration
 @RequiredArgsConstructor
@@ -20,9 +13,11 @@ public class AtualizaPedidoListener {
 
     private final IPedidoUseCasePort pedidoUseCasePort;
 
-    @SqsListener(queueNames = "${queue.update.pedido}")
+    @SqsListener(queueNames = "${queue.update.pedido}", factory = "defaultSqsListenerContainerFactory")
     public void listenStatusUpdate(AtualizaPedidoFila message) {
+        System.out.println(message.getTipoAtualizacao());
         if(message.getTipoAtualizacao().equals(TipoAtualizacao.P)){
+            System.out.println("aqui");
             this.pedidoUseCasePort.atualizarPedido(
                     message.getIdPedido(),
                     TipoAtualizacao.P,

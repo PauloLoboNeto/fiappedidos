@@ -12,11 +12,20 @@ import com.fiap.pedidos.usecases.PedidoProdutoUseCaseImpl;
 import com.fiap.pedidos.usecases.PedidoUseCaseImpl;
 import com.fiap.pedidos.usecases.ProdutoUseCaseImpl;
 import io.awspring.cloud.sqs.config.SqsListenerConfigurer;
+import io.awspring.cloud.sqs.config.SqsMessageListenerContainerFactory;
+import io.awspring.cloud.sqs.listener.QueueNotFoundStrategy;
+import io.awspring.cloud.sqs.listener.acknowledgement.handler.AcknowledgementMode;
+import io.awspring.cloud.sqs.listener.errorhandler.ErrorHandler;
+import io.awspring.cloud.sqs.support.converter.SqsMessagingMessageConverter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+import org.springframework.messaging.Message;
 import org.springframework.messaging.converter.MappingJackson2MessageConverter;
+import org.springframework.messaging.converter.MessageConverter;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.util.MimeType;
+import software.amazon.awssdk.services.sqs.SqsAsyncClient;
 
 @Configuration
 public class ConfigurationContext {
@@ -71,4 +80,16 @@ public class ConfigurationContext {
         };
     }
 
+    @Bean
+    SqsMessageListenerContainerFactory<Object> defaultSqsListenerContainerFactory(SqsAsyncClient sqsAsyncClient) {
+        return SqsMessageListenerContainerFactory
+                .builder()
+                .configure(options -> options
+//                        .messageConverter(sqsMessagingMessageConverter())
+                        .queueNotFoundStrategy(QueueNotFoundStrategy.FAIL)
+                        .acknowledgementMode(AcknowledgementMode.ALWAYS)
+                )
+                .sqsAsyncClient(sqsAsyncClient)
+                .build();
+    }
 }
