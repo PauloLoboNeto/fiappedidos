@@ -22,7 +22,6 @@ services:
         "spring.jpa.hibernate.show-sql" : true,
         "spring.jpa.hibernate.ddl-auto":"update",
 
-        "fila.service.url" : "http://localhost:9092/tech-challenge/fila",
         "pagamentos.service.url" : "http://localhost:9090/tech-challenge/pagamento",
         
         "queue.fila.pedido" : "Fila1",
