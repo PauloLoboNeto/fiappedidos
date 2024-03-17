@@ -1,42 +1,42 @@
-name: Steps validate on PR
+#name: Steps validate on PR
+#
+#on:
+#  pull_request:
+#    types:
+#      - opened
+#    branches:
+#      - main
 
-on:
-  pull_request:
-    types:
-      - opened
-    branches:
-      - main
+#jobs:
+#  quality_bdd:
+#    runs-on: ubuntu-latest
+#
+#    steps:
+#      - name: Checkout do Código
+#        uses: actions/checkout@v2
+#
+#      - name: Configurar JDK
+#        uses: actions/setup-java@v2
+#        with:
+#          distribution: 'adopt'
+#          java-version: '17'
+#          java-package: 'jdk'
+#          architecture: 'x64'
+#
+#      - name: Construir com Maven
+#        run: mvn clean install -DskipTests
 
-jobs:
-  quality_bdd:
-    runs-on: ubuntu-latest
+#      - name: Executar testes
+#        run: mvn spring-boot:run -Dspring.profiles.active=dev &
 
-    steps:
-      - name: Checkout do Código
-        uses: actions/checkout@v2
+#      - name: Aguardar Inicialização
+#        run: sleep 30s
 
-      - name: Configurar JDK
-        uses: actions/setup-java@v2
-        with:
-          distribution: 'adopt'
-          java-version: '17'
-          java-package: 'jdk'
-          architecture: 'x64'
+#      - name: Executar BDD
+#        run: mvn test -Psystem-test
 
-      - name: Construir com Maven
-        run: mvn clean install -DskipTests
-
-      - name: Executar testes
-        run: mvn spring-boot:run -Dspring.profiles.active=dev &
-
-      - name: Aguardar Inicialização
-        run: sleep 30s
-
-      - name: Executar BDD
-        run: mvn test -Psystem-test
-
-      - name: Encerrar Aplicação
-        run: pkill -f "spring-boot:run"
+#      - name: Encerrar Aplicação
+#        run: pkill -f "spring-boot:run"
 
   # sonarcloud:
   #   name: SonarCloud

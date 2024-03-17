@@ -86,7 +86,7 @@ public class ConfigurationContext {
                 .builder()
                 .configure(options -> options
 //                        .messageConverter(sqsMessagingMessageConverter())
-                        .queueNotFoundStrategy(QueueNotFoundStrategy.FAIL)
+                        .queueNotFoundStrategy(QueueNotFoundStrategy.CREATE)
                         .acknowledgementMode(AcknowledgementMode.ALWAYS)
                 )
                 .sqsAsyncClient(sqsAsyncClient)
