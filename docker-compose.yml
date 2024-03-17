@@ -1,57 +1,42 @@
 version: '3.3'
 
 services:
-  postgres:
-    image: postgres
-    container_name: dbpedidos
-    env_file: ./.env
-    environment:
-      - POSTGRES_PASSWORD=$POSTGRES_ROOT_PASSWORD
-    ports:
-      - $POSTGRES_LOCAL_PORT:$POSTGRES_DOCKER_PORT
-    networks:
-      - pedidos_default
-
   app:
-    depends_on:
-      - postgres
-    build: ./
-    env_file: ./.env
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
     ports:
-      - $SPRING_LOCAL_PORT:$SPRING_DOCKER_PORT
+      - 9091:9091
     environment:
       SPRING_APPLICATION_JSON: '{
-        "spring.datasource.url"  : "jdbc:postgresql://postgres:$POSTGRES_DOCKER_PORT/$POSTGRES_DATABASE",
-        "spring.datasource.username" : "$POSTGRES_ROOT_USER",
-        "spring.datasource.password" : "$POSTGRES_ROOT_PASSWORD",
-        "spring.jpa.hibernate.show-sql" : true,
+        "server.port" : "9091",
+        "server.servlet.context-path" : "/tech-challenge",
+        
+        "spring.datasource.url" : "jdbc:h2:mem:testdb", 
+        "spring.jpa.properties.hibernate.dialect" : "org.hibernate.dialect.H2Dialect", 
+        "spring.datasource.driver-class-name": "org.h2.Driver",
         "spring.datasource.initialization-mode" : "always",
         "spring.datasource.initialize" : true,
-        "spring.datasource.continue-on-error": true,
+        "spring.datasource.username" : "pass",
+        "spring.datasource.password" : "pass",
+        "spring.jpa.hibernate.show-sql" : true,
         "spring.jpa.hibernate.ddl-auto":"update",
-        "server.port" : "$SPRING_LOCAL_PORT",
-        "server.servlet.context-path" : "/tech-challenge",
+
         "fila.service.url" : "http://localhost:9092/tech-challenge/fila",
         "pagamentos.service.url" : "http://localhost:9090/tech-challenge/pagamento",
+        
+        "queue.fila.pedido" : "Fila1",
+        "queue.update.pedido" : "StatusChange",
+        
         "feign.client.config.default.connectTimeout" : 14000,
         "feign.client.config.default.readTimeout" : 14000
       }'
+
     volumes:
       - .m2:/root/.m2
+      - .aws:/root/.aws
     stdin_open: true
     tty: true
-    networks:
-      - pedidos_default
-
-  phppgadmin:
-    image: dpage/pgadmin4
-    container_name: phppgadminpedidos
-    env_file: ./.env
-    environment:
-      - PGADMIN_DEFAULT_EMAIL=$PGADMIN_ROOT_EMAIL
-      - PGADMIN_DEFAULT_PASSWORD=$PGADMIN_ROOT_PASSWORD
-    ports:
-      - "8081:80"
     networks:
       - pedidos_default
 

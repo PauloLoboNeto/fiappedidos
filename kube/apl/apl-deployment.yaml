@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: apl-pedidos
-          image: plobon/apl-back:v3
+          image: plobon/apl-back:v4
           imagePullPolicy: "Always"
           env:
             - name: spring.jpa.properties.hibernate.dialect
@@ -60,11 +60,6 @@ spec:
                 configMapKeyRef:
                   name: apl-pedidos-config
                   key: SERVLET_CONTEXT_PATH
-            - name: fila.service.url
-              valueFrom:
-                configMapKeyRef:
-                  name: apl-pedidos-config
-                  key: FILA_URL
             - name: pagamentos.service.url
               valueFrom:
                 configMapKeyRef:
@@ -80,6 +75,16 @@ spec:
                 configMapKeyRef:
                   name: apl-pedidos-config
                   key: FEIGN_READ_TIMEOUT
+            - name: queue.fila.pedido
+              valueFrom:
+                configMapKeyRef:
+                  name: apl-pedidos-config
+                  key: QUEUE_FILA_PEDIDO
+            - name: queue.update.pedido
+              valueFrom:
+                configMapKeyRef:
+                  name: apl-pedidos-config
+                  key: QUEUE_UPDATE_PEDIDO
 
           ports:
             - containerPort: 9091
