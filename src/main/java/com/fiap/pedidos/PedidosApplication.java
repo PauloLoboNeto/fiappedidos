@@ -14,6 +14,8 @@ import org.springframework.scheduling.annotation.EnableAsync;
 public class PedidosApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(PedidosApplication.class, args);
+		SpringApplication app = new SpringApplication(PedidosApplication.class);
+//		app.addListeners(new ListenerOfSecrets());
+		app.run(args);
 	}
 }
