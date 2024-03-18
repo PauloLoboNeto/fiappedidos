@@ -13,4 +13,6 @@ public interface IClienteRepositoryPort {
     Optional<Cliente> buscarPorCpf(Cpf cpf);
     List<Cliente> bucarTodos();
     Optional<Cliente> buscarPorId(UUID uuid);
+
+    void excluir(Cliente cliente);
 }

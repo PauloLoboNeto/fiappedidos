@@ -2,6 +2,7 @@ package com.fiap.pedidos.gateways;
 
 import com.fiap.pedidos.entities.Cliente;
 import com.fiap.pedidos.entities.Cpf;
+import com.fiap.pedidos.exceptions.entities.ClienteInformacoesInvalidasException;
 import com.fiap.pedidos.gateways.entities.ClienteEntity;
 import com.fiap.pedidos.interfaces.gateways.IClienteRepositoryPort;
 import com.fiap.pedidos.interfaces.repositories.ClienteRepository;
@@ -9,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -48,5 +50,10 @@ public class ClienteRepositoryAdapter implements IClienteRepositoryPort {
     @Override
     public Optional<Cliente> buscarPorId(UUID uuid) {
         return clienteRepository.findById(uuid).map(obj -> obj.to(obj));
+    }
+
+    @Override
+    public void excluir(Cliente cliente) {
+        clienteRepository.deleteById(cliente.getId());
     }
 }
